@@ -1,0 +1,170 @@
+/* Darul Irshad School of Excellence (DISE) - Ultra-Premium Executive Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --dise-bronze: #5C3A21;
+  --dise-bronze-dark: #3A2313;
+  --dise-bronze-light: #7E5232;
+  --dise-gold: #C49B66;
+  --dise-gold-light: #F4E8D8;
+  --dise-gold-glow: rgba(196, 155, 102, 0.3);
+  --dise-cream: #FDFCF7;
+  --dise-card-bg: #FFFFFF;
+  --dise-[#2C1A0E]: #2A1A0F;
+}
+
+body {
+  background-color: #F8F6F0 !important;
+  color: #2A1A0F;
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font-display {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Glassmorphism Luxury Cards & Components */
+.glass-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(92, 58, 33, 0.08);
+  box-shadow: 0 12px 32px -8px rgba(92, 58, 33, 0.06), 0 4px 12px -2px rgba(92, 58, 33, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  box-shadow: 0 20px 40px -10px rgba(92, 58, 33, 0.12), 0 6px 16px -2px rgba(92, 58, 33, 0.04);
+  transform: translateY(-2px);
+}
+
+.dark .glass-card {
+  background: rgba(30, 20, 13, 0.95);
+  border: 1px solid rgba(196, 155, 102, 0.2);
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
+}
+
+.dark .glass-card:hover {
+  border-color: rgba(196, 155, 102, 0.4);
+  box-shadow: 0 20px 44px -10px rgba(0, 0, 0, 0.7);
+}
+
+.glass-nav {
+  background: rgba(253, 252, 247, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(92, 58, 33, 0.1);
+}
+
+.dark .glass-nav {
+  background: rgba(20, 13, 8, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(196, 155, 102, 0.2);
+}
+
+.glass-sidebar {
+  background: #FFFFFF;
+  border-right: 1px solid rgba(92, 58, 33, 0.08);
+}
+
+.dark .glass-sidebar {
+  background: rgba(20, 13, 8, 0.95);
+  border-right: 1px solid rgba(196, 155, 102, 0.18);
+}
+
+.glass-modal {
+  background: #FFFFFF;
+  border: 1px solid rgba(92, 58, 33, 0.15);
+  box-shadow: 0 30px 60px -15px rgba(92, 58, 33, 0.3);
+}
+
+.dark .glass-modal {
+  background: #1F150D;
+  border: 1px solid rgba(196, 155, 102, 0.3);
+  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8);
+}
+
+/* Premium Gradients & Glow Effects */
+.bg-gradient-bronze {
+  background: linear-gradient(135deg, #5C3A21 0%, #3A2313 100%);
+}
+
+.bg-gradient-gold {
+  background: linear-gradient(135deg, #C49B66 0%, #9E7440 100%);
+}
+
+.gold-glow {
+  box-shadow: 0 0 20px rgba(196, 155, 102, 0.35);
+}
+
+.bronze-glow {
+  box-shadow: 0 0 20px rgba(92, 58, 33, 0.25);
+}
+
+/* Digital ID Card Styling */
+.id-card-bg {
+  background: linear-gradient(135deg, #FFFFFF 0%, #FAFAF7 50%, #F4E8D8 100%);
+  border: 2px solid #C49B66;
+}
+
+/* Badge Metallic Styling */
+.badge-gold {
+  background: linear-gradient(135deg, #C49B66 0%, #9E7440 100%);
+  color: #FFFFFF;
+}
+
+.badge-bronze {
+  background: linear-gradient(135deg, #5C3A21 0%, #3A2313 100%);
+  color: #FFFFFF;
+}
+
+/* Shimmer Effect */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(196,155,102,0.15) 50%, rgba(255,255,255,0) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(92, 58, 33, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(92, 58, 33, 0.5);
+}
+
+/* Print Styles for Official Student ID Cards & Reports */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .glass-card, .id-card-bg {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+}

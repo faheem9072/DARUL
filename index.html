@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Darul Irshad School of Excellence (DISE) - Internal Management Portal</title>
+  <meta name="description" content="Internal School Management System and Faculty ERP Portal for Darul Irshad School of Excellence (DISE)." />
+
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons Library -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lucide-static@0.321.0/font/lucide.css" />
+
+  <!-- Tailwind CSS Engine -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            dise: {
+              bronze: '#5C3A21',
+              dark: '#3A2313',
+              light: '#7E5232',
+              gold: '#B88B58',
+              cream: '#FAFAF7',
+              sand: '#F4F0EA'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Outfit', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS Styles -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-[#FAFAF7] dark:bg-[#170F0B] text-[#2C1A0E] dark:text-[#F4F0EA] font-sans antialiased selection:bg-[#B88B58]/30">
+  
+  <div id="root"></div>
+
+  <!-- Firebase Web SDK v10 (Compat & Modular compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+  <script>
+    // Firebase configuration for Darul Irshad School of Excellence (DISE)
+    window.firebaseConfig = {
+      apiKey: "AIzaSyCQNSXvfnwR_RsrMHA92dQLGPJzV6fMDcc",
+      authDomain: "darul-c3dcd.firebaseapp.com",
+      databaseURL: "https://darul-c3dcd-default-rtdb.firebaseio.com",
+      projectId: "darul-c3dcd",
+      storageBucket: "darul-c3dcd.firebasestorage.app",
+      messagingSenderId: "876406440535",
+      appId: "1:876406440535:web:1b822d18b7222f7f155912",
+      measurementId: "G-GG1SYD3KGL"
+    };
+
+    if (typeof firebase !== 'undefined' && firebase.initializeApp) {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(window.firebaseConfig);
+        if (firebase.analytics) {
+          firebase.analytics();
+        }
+      }
+    }
+  </script>
+
+  <!-- Fast Web Application Bundle -->
+  <script src="app.js"></script>
+
+</body>
+</html>
