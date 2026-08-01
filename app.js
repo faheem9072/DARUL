@@ -763,21 +763,36 @@
   // Attendance Register View
   function renderAttendanceView() {
     const today = new Date().toISOString().split('T')[0];
+    const isTeacher = state.user && state.user.role === 'teacher';
     const userAssignedClass = state.user ? state.user.assignedClass : null;
     const classList = userAssignedClass ? [userAssignedClass] : ['Grade 8', 'Grade 7'];
     const activeClass = userAssignedClass || (state.selectedClass === 'All' ? 'Grade 8' : state.selectedClass);
     const studentsInClass = state.students.filter(s => s.class === activeClass);
+    
+    // Check saved attendance for active date
+    const todayRecords = (state.attendance && state.attendance[today]) ? state.attendance[today] : {};
 
     return `
       <div class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl">
           <div>
-            <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Daily Attendance Register</h2>
-            <p class="text-xs text-slate-500 mt-1">Mark daily attendance for ${userAssignedClass ? userAssignedClass : 'Grade 7 & Grade 8'}. Logged in as: <b>${state.user ? state.user.name : ''}</b></p>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Daily Attendance Register</h2>
+              ${isTeacher ? `
+                <span class="px-2.5 py-0.5 rounded-full bg-[#5C3A21] text-white text-[10px] font-bold flex items-center gap-1">
+                  <i class="lucide-lock text-xs text-[#C49B66]"></i> Class Teacher Restricted: ${userAssignedClass}
+                </span>
+              ` : `
+                <span class="px-2.5 py-0.5 rounded-full bg-[#C49B66] text-white text-[10px] font-bold">Principal Admin Mode</span>
+              `}
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+              ${isTeacher ? `Only <b>${state.user.name}</b> (${userAssignedClass} Class Teacher) can mark attendance for ${userAssignedClass}.` : 'Full Administrative Access to all Class Registers.'}
+            </p>
           </div>
           <div class="flex gap-3">
-            <input type="date" value="${today}" class="px-4 py-2 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold" />
-            <button onclick="window.diseApp.saveAttendance()" class="px-5 py-2.5 bg-[#5C3A21] text-white font-bold text-xs rounded-2xl shadow-lg hover:bg-[#3A2313] transition flex items-center gap-2">
+            <input type="date" value="${today}" class="px-4 py-2 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold text-[#5C3A21] dark:text-white" />
+            <button onclick="window.diseApp.saveAttendance()" class="px-5 py-2.5 bg-[#5C3A21] text-white font-bold text-xs rounded-2xl shadow-lg hover:bg-[#3A2313] transition flex items-center gap-2 font-display">
               <i class="lucide-save text-[#C49B66]"></i> Save Register
             </button>
           </div>
@@ -791,36 +806,46 @@
               }">${c} (${state.students.filter(s=>s.class===c).length} Students)</button>
             `).join('')}
           </div>
-        ` : ''}
+        ` : `
+          <div class="p-3.5 rounded-2xl bg-[#5C3A21]/10 border border-[#5C3A21]/20 flex items-center justify-between text-xs font-bold text-[#5C3A21] dark:text-[#C49B66]">
+            <span class="flex items-center gap-2">
+              <i class="lucide-shield-check text-base"></i> Logged in as Class Teacher of <b>${userAssignedClass}</b> (${state.user.name})
+            </span>
+            <span class="text-[10px] uppercase font-black bg-[#5C3A21] text-white px-2 py-0.5 rounded-md">Locked Register</span>
+          </div>
+        `}
 
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between border-b border-[#5C3A21]/15 pb-3">
             <h3 class="font-extrabold text-[#5C3A21] dark:text-white text-sm">Attendance List for ${activeClass} (${studentsInClass.length} Students)</h3>
-            <span class="px-3 py-1 rounded-full bg-[#5C3A21]/10 text-[#5C3A21] text-xs font-bold font-mono">Class Register</span>
+            <span class="px-3 py-1 rounded-full bg-[#5C3A21]/10 text-[#5C3A21] text-xs font-bold font-mono">Official Register</span>
           </div>
           <div class="space-y-3">
-            ${studentsInClass.map((st) => `
-              <div class="flex items-center justify-between p-4 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15">
-                <div class="flex items-center gap-3">
-                  <span class="w-8 h-8 rounded-xl bg-[#5C3A21]/10 text-[#5C3A21] font-bold text-xs flex items-center justify-center">${st.rollNo}</span>
-                  <div>
-                    <h4 class="font-bold text-xs text-[#2A1A0F] dark:text-white">${st.name}</h4>
-                    <p class="text-[10px] text-slate-400 font-mono">${st.studentId} &bull; Class Teacher: ${st.classTeacher}</p>
+            ${studentsInClass.map((st) => {
+              const prevAtt = todayRecords[st.id] ? todayRecords[st.id].status : 'Present';
+              return `
+                <div class="flex items-center justify-between p-4 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15">
+                  <div class="flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-xl bg-[#5C3A21]/10 text-[#5C3A21] font-bold text-xs flex items-center justify-center font-mono">${st.rollNo}</span>
+                    <div>
+                      <h4 class="font-bold text-xs text-[#2A1A0F] dark:text-white">${st.name}</h4>
+                      <p class="text-[10px] text-slate-400 font-mono">${st.studentId} &bull; Class Teacher: ${st.classTeacher}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 font-bold text-xs cursor-pointer hover:bg-emerald-500/20">
+                      <input type="radio" name="att-${st.id}" value="Present" ${prevAtt === 'Present' ? 'checked' : ''} class="accent-emerald-600" /> Present
+                    </label>
+                    <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 font-bold text-xs cursor-pointer hover:bg-rose-500/20">
+                      <input type="radio" name="att-${st.id}" value="Absent" ${prevAtt === 'Absent' ? 'checked' : ''} class="accent-rose-600" /> Absent
+                    </label>
+                    <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#C49B66]/10 text-[#5C3A21] font-bold text-xs cursor-pointer hover:bg-[#C49B66]/20">
+                      <input type="radio" name="att-${st.id}" value="Late" ${prevAtt === 'Late' ? 'checked' : ''} class="accent-[#C49B66]" /> Late
+                    </label>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
-                  <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 text-emerald-600 font-bold text-xs cursor-pointer hover:bg-emerald-500/20">
-                    <input type="radio" name="att-${st.id}" value="Present" checked class="accent-emerald-600" /> Present
-                  </label>
-                  <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-500/10 text-rose-600 font-bold text-xs cursor-pointer hover:bg-rose-500/20">
-                    <input type="radio" name="att-${st.id}" value="Absent" class="accent-rose-600" /> Absent
-                  </label>
-                  <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#C49B66]/10 text-[#5C3A21] font-bold text-xs cursor-pointer hover:bg-[#C49B66]/20">
-                    <input type="radio" name="att-${st.id}" value="Late" class="accent-[#C49B66]" /> Late
-                  </label>
-                </div>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
       </div>
@@ -1627,7 +1652,31 @@
     },
 
     saveAttendance: function() {
-      showToast('Attendance Saved', 'Daily register recorded in database.');
+      const dateInput = document.querySelector('input[type="date"]');
+      const dateVal = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+      const userAssignedClass = state.user ? state.user.assignedClass : null;
+      const activeClass = userAssignedClass || (state.selectedClass === 'All' ? 'Grade 8' : state.selectedClass);
+      const studentsInClass = state.students.filter(s => s.class === activeClass);
+
+      if (!state.attendance) state.attendance = {};
+      if (!state.attendance[dateVal]) state.attendance[dateVal] = {};
+
+      let count = 0;
+      studentsInClass.forEach(st => {
+        const checkedRadio = document.querySelector(`input[name="att-${st.id}"]:checked`);
+        if (checkedRadio) {
+          state.attendance[dateVal][st.id] = {
+            status: checkedRadio.value,
+            markedBy: state.user ? state.user.name : 'Teacher',
+            markedAt: new Date().toLocaleTimeString(),
+            class: activeClass
+          };
+          count++;
+        }
+      });
+
+      setStore(STORAGE_KEYS.ATTENDANCE, state.attendance);
+      showToast('Attendance Saved', `Daily register for ${activeClass} (${count} students) saved to database.`);
     },
 
     downloadDoc: function(title) {
