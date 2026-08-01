@@ -225,10 +225,12 @@
     selectedStaffForProfile: null,
     selectedStudentForIDCard: null,
     isAddStudentModalOpen: false,
+    isAddStaffModalOpen: false,
     isAddLeaveModalOpen: false,
     isAddNoticeModalOpen: false,
     isCommandPaletteOpen: false,
-    editingStudent: null
+    editingStudent: null,
+    editingStaff: null
   };
 
   function showToast(title, message, type = 'success') {
@@ -617,6 +619,7 @@
 
   // Staff Directory View
   function renderStaffDirectoryView() {
+    const isAdmin = state.user && state.user.role === 'admin';
     return `
       <div class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl">
@@ -624,9 +627,13 @@
             <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Staff Directory & Faculty Profiles</h2>
             <p class="text-xs text-slate-500 mt-1">Darul Irshad School of Excellence &bull; Academic Teaching Staff</p>
           </div>
-          <button onclick="alert('Faculty member addition form ready.')" class="px-4 py-2.5 bg-[#5C3A21] text-white font-bold text-xs rounded-2xl shadow-lg hover:bg-[#3A2313] transition flex items-center gap-2">
-            <i class="lucide-user-plus text-[#C49B66]"></i> Add Faculty Member
-          </button>
+          ${isAdmin ? `
+            <button onclick="window.diseApp.openAddStaffModal()" class="px-4 py-2.5 bg-[#5C3A21] text-white font-bold text-xs rounded-2xl shadow-lg hover:bg-[#3A2313] transition flex items-center gap-2">
+              <i class="lucide-user-plus text-[#C49B66]"></i> Add Faculty Member
+            </button>
+          ` : `
+            <span class="px-3 py-1 rounded-full bg-[#5C3A21]/10 text-[#5C3A21] text-xs font-bold font-mono">Faculty Directory View</span>
+          `}
         </div>
 
         <div class="glass-card rounded-3xl overflow-hidden">
@@ -641,7 +648,7 @@
                   <th class="p-4">Assigned Class</th>
                   <th class="p-4">Contact Information</th>
                   <th class="p-4 text-center">Status</th>
-                  <th class="p-4 text-center">Profile</th>
+                  <th class="p-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-[#5C3A21]/10">
@@ -655,9 +662,19 @@
                     <td class="p-4 font-mono text-slate-500">${f.phone}<br/><span class="text-[10px] text-slate-400">${f.email}</span></td>
                     <td class="p-4 text-center"><span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-600">${f.status}</span></td>
                     <td class="p-4 text-center">
-                      <button onclick="window.diseApp.viewStaffProfile('${f.id}')" class="px-3 py-1 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-bold text-[10px] rounded-xl shadow transition flex items-center gap-1 mx-auto">
-                        <i class="lucide-user text-xs text-[#C49B66]"></i> View Profile
-                      </button>
+                      <div class="flex items-center justify-center gap-1.5">
+                        <button onclick="window.diseApp.viewStaffProfile('${f.id}')" class="px-2.5 py-1 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-bold text-[10px] rounded-xl shadow transition flex items-center gap-1">
+                          <i class="lucide-user text-xs text-[#C49B66]"></i> Profile
+                        </button>
+                        ${isAdmin ? `
+                          <button onclick="window.diseApp.openEditStaffModal('${f.id}')" class="px-2.5 py-1 bg-[#C49B66] hover:bg-[#a67c4b] text-white font-bold text-[10px] rounded-xl shadow transition flex items-center gap-1">
+                            <i class="lucide-edit text-xs"></i> Edit
+                          </button>
+                          <button onclick="window.diseApp.deleteStaff('${f.id}')" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] rounded-xl shadow transition flex items-center gap-1">
+                            <i class="lucide-trash-2 text-xs"></i> Delete
+                          </button>
+                        ` : ''}
+                      </div>
                     </td>
                   </tr>
                 `).join('')}
@@ -1326,9 +1343,127 @@
                   <option value="Inactive" ${st.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
                 </select>
               </div>
+      `;
+    }
+
+    // 6. Add Staff Modal (Admin Only)
+    if (state.isAddStaffModalOpen) {
+      return `
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div class="glass-modal w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-[#5C3A21]/20 pb-3">
+              <h3 class="font-extrabold text-base text-[#5C3A21] font-display">Add New Faculty Member</h3>
+              <button onclick="window.diseApp.closeModals()" class="text-slate-400 hover:text-slate-600"><i class="lucide-x text-lg"></i></button>
+            </div>
+            <form id="form-add-staff" onsubmit="window.diseApp.submitAddStaff(event)" class="space-y-3 text-xs">
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Faculty Full Name *</label>
+                <input type="text" required name="name" placeholder="e.g. Usthad Hafiz Ahmed" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Designation *</label>
+                  <input type="text" required name="designation" placeholder="e.g. Faculty Member" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Role *</label>
+                  <select name="role" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white">
+                    <option value="Class Teacher">Class Teacher</option>
+                    <option value="Subject Specialist">Subject Specialist</option>
+                    <option value="Senior Faculty">Senior Faculty</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Assigned Class *</label>
+                  <select name="assignedClass" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white">
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
+                    <option value="Grade 7 & Grade 8">Grade 7 & Grade 8</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Phone Number *</label>
+                  <input type="text" required name="phone" placeholder="+91 98470 22004" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-mono font-semibold text-[#2A1A0F] dark:text-white" />
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
+                <input type="email" required name="email" placeholder="faculty@darulirshad.edu.in" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Subjects (Comma separated)</label>
+                <input type="text" name="subjects" placeholder="Islamic Studies, Arabic, English" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+              </div>
               <div class="flex gap-2 pt-2">
                 <button type="button" onclick="window.diseApp.closeModals()" class="flex-1 py-2.5 rounded-xl font-bold bg-slate-200 text-slate-700">Cancel</button>
-                <button type="submit" class="flex-1 py-2.5 rounded-xl font-bold bg-[#5C3A21] text-white hover:bg-[#3A2313] shadow">Update Student</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl font-bold bg-[#5C3A21] text-white hover:bg-[#3A2313]">Save Faculty Member</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+    }
+
+    // 7. Edit Staff Modal (Admin Only)
+    if (state.editingStaff) {
+      const f = state.editingStaff;
+      return `
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+          <div class="glass-modal w-full max-w-lg rounded-3xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-[#5C3A21]/20 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-[#5C3A21] text-white text-[10px] font-black uppercase">Edit Faculty Profile</span>
+                <span class="text-xs font-mono font-bold text-[#C49B66]">${f.staffId}</span>
+              </div>
+              <button onclick="window.diseApp.closeModals()" class="text-slate-400 hover:text-slate-600"><i class="lucide-x text-lg"></i></button>
+            </div>
+            <form onsubmit="window.diseApp.submitEditStaff(event)" class="space-y-3 text-xs">
+              <input type="hidden" name="id" value="${f.id}" />
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Faculty Full Name *</label>
+                <input type="text" required name="name" value="${f.name}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Designation *</label>
+                  <input type="text" required name="designation" value="${f.designation}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Role *</label>
+                  <select name="role" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white">
+                    <option value="Class Teacher" ${f.role === 'Class Teacher' ? 'selected' : ''}>Class Teacher</option>
+                    <option value="Subject Specialist" ${f.role === 'Subject Specialist' ? 'selected' : ''}>Subject Specialist</option>
+                    <option value="Senior Faculty" ${f.role === 'Senior Faculty' ? 'selected' : ''}>Senior Faculty</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Assigned Class *</label>
+                  <select name="assignedClass" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white">
+                    <option value="Grade 7" ${f.assignedClass === 'Grade 7' ? 'selected' : ''}>Grade 7</option>
+                    <option value="Grade 8" ${f.assignedClass === 'Grade 8' ? 'selected' : ''}>Grade 8</option>
+                    <option value="Grade 7 & Grade 8" ${f.assignedClass === 'Grade 7 & Grade 8' ? 'selected' : ''}>Grade 7 & Grade 8</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Phone Number *</label>
+                  <input type="text" required name="phone" value="${f.phone}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-mono font-semibold text-[#2A1A0F] dark:text-white" />
+                </div>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Email Address *</label>
+                <input type="email" required name="email" value="${f.email}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Subjects (Comma separated)</label>
+                <input type="text" name="subjects" value="${Array.isArray(f.subjects) ? f.subjects.join(', ') : f.subjects}" class="w-full px-3.5 py-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 font-semibold text-[#2A1A0F] dark:text-white" />
+              </div>
+              <div class="flex gap-2 pt-2">
+                <button type="button" onclick="window.diseApp.closeModals()" class="flex-1 py-2.5 rounded-xl font-bold bg-slate-200 text-slate-700">Cancel</button>
+                <button type="submit" class="flex-1 py-2.5 rounded-xl font-bold bg-[#5C3A21] text-white hover:bg-[#3A2313]">Update Faculty Details</button>
               </div>
             </form>
           </div>
@@ -1551,15 +1686,104 @@
       showToast('Notice Posted', 'Announcement added to Notice Board');
     },
 
+    openAddStaffModal: function() {
+      if (!state.user || state.user.role !== 'admin') {
+        showToast('Permission Denied', 'Only Principal / System Admin can add new faculty.', 'error');
+        return;
+      }
+      state.isAddStaffModalOpen = true;
+      render();
+    },
+
+    openEditStaffModal: function(id) {
+      if (!state.user || state.user.role !== 'admin') {
+        showToast('Permission Denied', 'Only Principal / System Admin can edit faculty details.', 'error');
+        return;
+      }
+      const staff = state.staff.find(s => s.id === id);
+      if (staff) {
+        state.editingStaff = { ...staff };
+        render();
+      }
+    },
+
     closeModals: function() {
       state.selectedStaffForProfile = null;
       state.selectedStudentForIDCard = null;
       state.isCommandPaletteOpen = false;
       state.isAddStudentModalOpen = false;
+      state.isAddStaffModalOpen = false;
       state.isAddLeaveModalOpen = false;
       state.isAddNoticeModalOpen = false;
       state.editingStudent = null;
+      state.editingStaff = null;
       render();
+    },
+
+    submitAddStaff: function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const subjectsArr = form.subjects.value.split(',').map(s => s.trim()).filter(Boolean);
+      const newStaff = {
+        id: `stf-${Date.now()}`,
+        staffId: `DISE-FAC-00${state.staff.length + 1}`,
+        name: form.name.value,
+        designation: form.designation.value,
+        role: form.role.value,
+        assignedClass: form.assignedClass.value,
+        subjects: subjectsArr.length ? subjectsArr : ['Islamic Studies'],
+        phone: form.phone.value,
+        email: form.email.value,
+        status: 'Active',
+        joinDate: new Date().toISOString().split('T')[0]
+      };
+
+      state.staff.unshift(newStaff);
+      setStore(STORAGE_KEYS.STAFF, state.staff);
+      state.isAddStaffModalOpen = false;
+      render();
+      showToast('Faculty Added', `${newStaff.name} added to staff directory.`);
+    },
+
+    submitEditStaff: function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const id = form.id.value;
+      const subjectsArr = form.subjects.value.split(',').map(s => s.trim()).filter(Boolean);
+
+      state.staff = state.staff.map(f => {
+        if (f.id === id) {
+          return {
+            ...f,
+            name: form.name.value,
+            designation: form.designation.value,
+            role: form.role.value,
+            assignedClass: form.assignedClass.value,
+            phone: form.phone.value,
+            email: form.email.value,
+            subjects: subjectsArr.length ? subjectsArr : f.subjects
+          };
+        }
+        return f;
+      });
+
+      setStore(STORAGE_KEYS.STAFF, state.staff);
+      state.editingStaff = null;
+      render();
+      showToast('Faculty Updated', 'Faculty details updated successfully in database.');
+    },
+
+    deleteStaff: function(id) {
+      if (!state.user || state.user.role !== 'admin') {
+        showToast('Permission Denied', 'Only Admin can remove faculty.', 'error');
+        return;
+      }
+      if (confirm('Are you sure you want to remove this faculty member?')) {
+        state.staff = state.staff.filter(s => s.id !== id);
+        setStore(STORAGE_KEYS.STAFF, state.staff);
+        render();
+        showToast('Faculty Removed', 'Faculty member removed from directory.', 'error');
+      }
     },
 
     submitAddStudent: function(e) {
