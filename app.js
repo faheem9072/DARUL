@@ -688,20 +688,26 @@
 
   // Student Directory View
   function renderStudentsView() {
+    const isTeacher = state.user && state.user.role === 'teacher';
+    const userAssignedClass = state.user ? state.user.assignedClass : null;
+    
     const filtered = state.students.filter(s => {
       const matchesSearch = s.name.toLowerCase().includes(state.searchQuery.toLowerCase()) || s.studentId.toLowerCase().includes(state.searchQuery.toLowerCase());
-      const matchesClass = state.selectedClass === 'All' || s.class === state.selectedClass;
+      const classFilter = userAssignedClass || state.selectedClass;
+      const matchesClass = classFilter === 'All' || s.class === classFilter;
       return matchesSearch && matchesClass;
     });
 
-    const classesList = ['All', 'Grade 8', 'Grade 7'];
+    const classesList = userAssignedClass ? [userAssignedClass] : ['All', 'Grade 8', 'Grade 7'];
 
     return `
       <div class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl">
           <div>
             <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Official Students Directory (2026)</h2>
-            <p class="text-xs text-slate-500 mt-1">Grade 7 & Grade 8 &bull; Total 21 Students Enrolled</p>
+            <p class="text-xs text-slate-500 mt-1">
+              ${userAssignedClass ? `Viewing Class Register: <b>${userAssignedClass}</b> (${filtered.length} Students)` : 'Grade 7 & Grade 8 &bull; Total 21 Students Enrolled'}
+            </p>
           </div>
           <div class="flex gap-2">
             <button onclick="window.diseApp.exportStudentCSV()" class="px-4 py-2.5 bg-white dark:bg-[#1F150D] border border-[#5C3A21]/30 hover:bg-[#5C3A21]/10 text-[#5C3A21] dark:text-white font-extrabold text-xs rounded-2xl shadow-md transition flex items-center gap-2">
@@ -716,13 +722,19 @@
         <div class="glass-card p-4 rounded-3xl flex flex-col sm:flex-row items-center gap-4">
           <div class="relative w-full sm:flex-1">
             <i class="lucide-search absolute left-4 top-3 text-[#5C3A21] text-sm"></i>
-            <input type="text" value="${state.searchQuery}" oninput="window.diseApp.setSearch(this.value)" placeholder="Search student name (e.g. Shalif, Ajwad, Naeem)..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-semibold focus:outline-none focus:border-[#5C3A21]" />
+            <input type="text" value="${state.searchQuery}" oninput="window.diseApp.setSearch(this.value)" placeholder="Search student name in ${userAssignedClass || 'all classes'}..." class="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-semibold focus:outline-none focus:border-[#5C3A21]" />
           </div>
-          <div class="w-full sm:w-56">
-            <select onchange="window.diseApp.setClassFilter(this.value)" class="w-full px-4 py-2.5 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold focus:outline-none focus:border-[#5C3A21]">
-              ${classesList.map(c => `<option value="${c}" ${state.selectedClass === c ? 'selected' : ''}>${c === 'All' ? 'All Classes (21 Students)' : c}</option>`).join('')}
-            </select>
-          </div>
+          ${!userAssignedClass ? `
+            <div class="w-full sm:w-56">
+              <select onchange="window.diseApp.setClassFilter(this.value)" class="w-full px-4 py-2.5 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold focus:outline-none focus:border-[#5C3A21]">
+                ${classesList.map(c => `<option value="${c}" ${state.selectedClass === c ? 'selected' : ''}>${c === 'All' ? 'All Classes (21 Students)' : c}</option>`).join('')}
+              </select>
+            </div>
+          ` : `
+            <span class="px-4 py-2.5 rounded-2xl bg-[#5C3A21]/10 text-[#5C3A21] font-extrabold text-xs font-mono">
+              ${userAssignedClass} Register (${filtered.length} Students)
+            </span>
+          `}
         </div>
 
         <div class="glass-card rounded-3xl overflow-hidden">
@@ -863,6 +875,15 @@
                 </div>
               `;
             }).join('')}
+          </div>
+
+          <div class="pt-4 border-t border-[#5C3A21]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-slate-500 font-bold">
+              Select Present / Absent / Late for each student in ${activeClass}, then click Submit.
+            </p>
+            <button onclick="window.diseApp.saveAttendance()" class="w-full sm:w-auto px-8 py-3.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
+              <i class="lucide-check-circle text-[#C49B66] text-base"></i> Submit Daily Attendance (${activeClass})
+            </button>
           </div>
         </div>
       </div>
