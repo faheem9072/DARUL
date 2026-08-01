@@ -1433,12 +1433,12 @@
     handleCustomLoginSubmit: function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim().toLowerCase();
-      if (email.includes('faheem')) {
+      if (email.includes('faheem') || email.includes('7')) {
         this.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher');
-      } else if (email.includes('swalih')) {
+      } else if (email.includes('swalih') || email.includes('8')) {
         this.login('Swalih Ahsani', 'teacher', 'swalih.a@darulirshad.edu.in', 'Grade 8', 'Grade 8 Class Teacher');
       } else {
-        this.login('Bava Ahsani', 'admin', email, null, 'Principal & Administrator');
+        this.login('Bava Ahsani', 'admin', 'principal@darulirshad.edu.in', null, 'Principal & Administrator');
       }
     },
 
