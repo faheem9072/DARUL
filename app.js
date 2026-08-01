@@ -103,7 +103,7 @@
     { id: 'st-812', studentId: 'DISE-2026-012', name: 'Muhammad Rifaee', class: 'Grade 8', section: 'A', rollNo: 12, gender: 'Male', parentName: 'Moideen Koya', parentPhone: '+91 98470 11012', status: 'Active', classTeacher: 'Swalih Ahsani' },
     { id: 'st-813', studentId: 'DISE-2026-013', name: 'Muhammad Hammad', class: 'Grade 8', section: 'A', rollNo: 13, gender: 'Male', parentName: 'Hassan Kutty', parentPhone: '+91 98470 11013', status: 'Active', classTeacher: 'Swalih Ahsani' },
 
-    // Grade 7 (Class VII - 8 Students)
+    // Grade 7 (Class VII - 9 Students)
     { id: 'st-701', studentId: 'DISE-2026-014', name: 'Muhammad Ajwad', class: 'Grade 7', section: 'A', rollNo: 1, gender: 'Male', parentName: 'Ashraf Ali', parentPhone: '+91 98470 11014', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
     { id: 'st-702', studentId: 'DISE-2026-015', name: 'Muhammed Sahal', class: 'Grade 7', section: 'A', rollNo: 2, gender: 'Male', parentName: 'Siddique K.T.', parentPhone: '+91 98470 11015', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
     { id: 'st-703', studentId: 'DISE-2026-016', name: 'Muhammad Shafi', class: 'Grade 7', section: 'A', rollNo: 3, gender: 'Male', parentName: 'Shafi Musliyar', parentPhone: '+91 98470 11016', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
@@ -111,7 +111,8 @@
     { id: 'st-705', studentId: 'DISE-2026-018', name: 'Muhammad Rithil V.V.', class: 'Grade 7', section: 'A', rollNo: 5, gender: 'Male', parentName: 'Rauf V.V.', parentPhone: '+91 98470 11018', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
     { id: 'st-706', studentId: 'DISE-2026-019', name: 'Sayyid Muhammed Naeem', class: 'Grade 7', section: 'A', rollNo: 6, gender: 'Male', parentName: 'Sayyid Thangal', parentPhone: '+91 98470 11019', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
     { id: 'st-707', studentId: 'DISE-2026-020', name: 'Muhammad Ijlan', class: 'Grade 7', section: 'A', rollNo: 7, gender: 'Male', parentName: 'Jaleel Haji', parentPhone: '+91 98470 11020', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
-    { id: 'st-708', studentId: 'DISE-2026-021', name: 'Mueenudheen', class: 'Grade 7', section: 'A', rollNo: 8, gender: 'Male', parentName: 'Moideen Musliyar', parentPhone: '+91 98470 11021', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' }
+    { id: 'st-708', studentId: 'DISE-2026-021', name: 'Mueenudheen', class: 'Grade 7', section: 'A', rollNo: 8, gender: 'Male', parentName: 'Moideen Musliyar', parentPhone: '+91 98470 11021', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' },
+    { id: 'st-709', studentId: 'DISE-2026-022', name: 'Muhammed Bakhtiyar', class: 'Grade 7', section: 'A', rollNo: 9, gender: 'Male', parentName: 'Bakhtiyar Parent', parentPhone: '+91 98470 11022', status: 'Active', classTeacher: 'Faheem Muhammed Saquafi' }
   ];
 
   const INITIAL_LEAVES = [
@@ -121,6 +122,7 @@
   ];
 
   const INITIAL_NOTICES = [
+    { id: 'nt-0', title: 'Pre-First Term Examination Timetable (Aug 05 - 12, 2026)', category: 'Exam Schedule', date: '2026-08-01', content: 'Official timetable for Pre-First Term Examinations for Grade 7 & Grade 8 published. Please check the Timetable section for complete details.', isPinned: true },
     { id: 'nt-1', title: 'First Term Examination Schedule Published', category: 'Academic', date: '2026-07-26', content: 'The comprehensive timetable for Grade 7 and Grade 8 First Term Exams is uploaded to the document repository.', isPinned: true },
     { id: 'nt-2', title: 'Parent Teacher Association (PTA) General Body Meeting', category: 'Events', date: '2026-07-24', content: 'All parents are cordially invited to attend the Annual PTA Meeting at School Auditorium on Saturday 10:00 AM.', isPinned: true },
     { id: 'nt-3', title: 'Independence Day Cultural Celebrations', category: 'Cultural', date: '2026-07-20', content: 'Student registrations open for patriotic song, speech and quiz competitions.', isPinned: false }
@@ -210,12 +212,34 @@
     }
   }
 
+  function loadStudentsInitial() {
+    let list = getStore(STORAGE_KEYS.STUDENTS, OFFICIAL_STUDENTS);
+    if (!list || !list.length) list = OFFICIAL_STUDENTS;
+    if (!list.some(s => s.name && s.name.toLowerCase().includes('bakhtiyar'))) {
+      list.push({
+        id: 'st-709',
+        studentId: 'DISE-2026-022',
+        name: 'Muhammed Bakhtiyar',
+        class: 'Grade 7',
+        section: 'A',
+        rollNo: 9,
+        gender: 'Male',
+        parentName: 'Bakhtiyar Parent',
+        parentPhone: '+91 98470 11022',
+        status: 'Active',
+        classTeacher: 'Faheem Muhammed Saquafi'
+      });
+      try { localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(list)); } catch(e){}
+    }
+    return list;
+  }
+
   let state = {
     user: getStore(STORAGE_KEYS.USER, { name: 'Bava Ahsani', role: 'admin', designation: 'Principal', email: 'principal@darulirshad.edu.in' }),
     activeTab: 'dashboard',
     leadership: SCHOOL_LEADERSHIP,
     staff: getStore(STORAGE_KEYS.STAFF, []),
-    students: getStore(STORAGE_KEYS.STUDENTS, []),
+    students: loadStudentsInitial(),
     leaves: getStore(STORAGE_KEYS.LEAVES, []),
     notices: getStore(STORAGE_KEYS.NOTICES, []),
     documents: [],
@@ -343,17 +367,20 @@
   }
 
   function renderSidebar() {
-    const navItems = [
-      { id: 'dashboard', label: 'Executive Dashboard', icon: 'lucide-layout-dashboard' },
-      { id: 'staff', label: 'Staff Management', icon: 'lucide-user-check', badge: state.staff.length },
-      { id: 'students', label: 'Student Directory', icon: 'lucide-users', badge: state.students.length },
-      { id: 'attendance', label: 'Attendance Register', icon: 'lucide-clipboard-check' },
-      { id: 'leave', label: 'Leave Approvals', icon: 'lucide-calendar-off', badge: state.leaves.filter(l=>l.status==='Pending').length },
-      { id: 'notices', label: 'Notice Board', icon: 'lucide-megaphone', badge: state.notices.length },
-      { id: 'timetable', label: 'Class Timetable', icon: 'lucide-clock' },
-      { id: 'documents', label: 'Documents & Circulars', icon: 'lucide-file-text' },
-      { id: 'settings', label: 'School Settings', icon: 'lucide-settings' }
+    const isParent = state.user && state.user.role === 'parent';
+    const allNavItems = [
+      { id: 'dashboard', label: isParent ? 'Parent Portal Home' : 'Executive Dashboard', icon: 'lucide-layout-dashboard' },
+      { id: 'staff', label: 'Staff Directory', icon: 'lucide-user-check', badge: state.staff.length, parentAllowed: true },
+      { id: 'students', label: 'Student Directory', icon: 'lucide-users', badge: state.students.length, parentAllowed: true },
+      { id: 'attendance', label: 'Attendance Register', icon: 'lucide-clipboard-check', parentAllowed: false },
+      { id: 'leave', label: 'Leave Approvals', icon: 'lucide-calendar-off', badge: state.leaves.filter(l=>l.status==='Pending').length, parentAllowed: false },
+      { id: 'notices', label: 'Notice Board & Notifications', icon: 'lucide-megaphone', badge: state.notices.length, parentAllowed: true },
+      { id: 'timetable', label: 'Class & Exam Timetables', icon: 'lucide-clock', parentAllowed: true },
+      { id: 'documents', label: 'Documents & Circulars', icon: 'lucide-file-text', parentAllowed: true },
+      { id: 'settings', label: 'School Settings', icon: 'lucide-settings', parentAllowed: false }
     ];
+
+    const navItems = isParent ? allNavItems.filter(i => i.parentAllowed) : allNavItems;
 
     return `
       <aside class="w-64 glass-sidebar hidden md:flex flex-col py-6 px-4 shrink-0">
@@ -794,9 +821,15 @@
     const today = new Date().toISOString().split('T')[0];
     const isTeacher = state.user && state.user.role === 'teacher';
     const userAssignedClass = state.user ? state.user.assignedClass : null;
-    const classList = userAssignedClass ? [userAssignedClass] : ['Grade 8', 'Grade 7'];
+    const classList = userAssignedClass ? [userAssignedClass] : ['Grade 8', 'Grade 7', 'General Class (Grade 7 & 8 Combined)'];
     const activeClass = userAssignedClass || (state.selectedClass === 'All' ? 'Grade 8' : state.selectedClass);
-    const studentsInClass = state.students.filter(s => s.class === activeClass);
+
+    let studentsInClass;
+    if (activeClass === 'General Class (Grade 7 & 8 Combined)') {
+      studentsInClass = state.students;
+    } else {
+      studentsInClass = state.students.filter(s => s.class === activeClass);
+    }
     
     // Check saved attendance for active date
     const todayRecords = (state.attendance && state.attendance[today]) ? state.attendance[today] : {};
@@ -816,7 +849,7 @@
               `}
             </div>
             <p class="text-xs text-slate-500 mt-1">
-              ${isTeacher ? `Only <b>${state.user.name}</b> (${userAssignedClass} Class Teacher) can mark attendance for ${userAssignedClass}.` : 'Full Administrative Access to all Class Registers.'}
+              ${isTeacher ? `Only <b>${state.user.name}</b> (${userAssignedClass} Class Teacher) can mark attendance for ${userAssignedClass}.` : 'Principal & General Class Combined Attendance Register.'}
             </p>
           </div>
           <div class="flex gap-3">
@@ -831,8 +864,8 @@
           <div class="flex gap-2 overflow-x-auto pb-2">
             ${classList.map(c => `
               <button onclick="window.diseApp.setClassFilter('${c}')" class="px-5 py-2 rounded-2xl font-bold text-xs transition ${
-                activeClass === c ? 'bg-[#5C3A21] text-white shadow-md' : 'bg-white dark:bg-[#1F150D] text-[#5C3A21] dark:text-slate-300 border border-[#5C3A21]/20'
-              }">${c} (${state.students.filter(s=>s.class===c).length} Students)</button>
+                activeClass === c ? 'bg-[#5C3A21] text-white shadow-md font-black' : 'bg-white dark:bg-[#1F150D] text-[#5C3A21] dark:text-slate-300 border border-[#5C3A21]/20'
+              }">${c} (${c === 'General Class (Grade 7 & 8 Combined)' ? state.students.length : state.students.filter(s=>s.class===c).length} Students)</button>
             `).join('')}
           </div>
         ` : `
@@ -981,42 +1014,121 @@
     };
     const subjects = Object.keys(teachersMap);
 
+    const grade8ExamSchedule = [
+      { date: '05-08-2026', day: 'Wednesday', subject: 'Mathematics' },
+      { date: '06-08-2026', day: 'Thursday', subject: 'English & Malayalam' },
+      { date: '07-08-2026', day: 'Friday', subject: 'Physics & Biology' },
+      { date: '10-08-2026', day: 'Monday', subject: 'Social Science & Chemistry' },
+      { date: '11-08-2026', day: 'Tuesday', subject: 'Hindi' },
+      { date: '12-08-2026', day: 'Wednesday', subject: 'Arabic' }
+    ];
+
+    const grade7ExamSchedule = [
+      { date: '06-08-2026', day: 'Thursday', subject: 'English & Malayalam' },
+      { date: '07-08-2026', day: 'Friday', subject: 'Basic Science (B.S)' },
+      { date: '10-08-2026', day: 'Monday', subject: 'Social Science (S.S)' },
+      { date: '11-08-2026', day: 'Tuesday', subject: 'Hindi' }
+    ];
+
     return `
       <div class="space-y-6">
-        <div class="glass-card p-6 rounded-3xl">
-          <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Class Timetable (Grade 7 & Grade 8)</h2>
-          <p class="text-xs text-slate-500 mt-1 font-medium">Faculty period assignments and classroom timetable.</p>
+        <div class="glass-card p-6 rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Academic & Examination Timetables</h2>
+            <p class="text-xs text-slate-500 mt-1 font-medium">Pre-First Term Examination (August 05 - 12, 2026) & Regular Schedules.</p>
+          </div>
+          <span class="px-3.5 py-1.5 rounded-full bg-[#5C3A21] text-white text-xs font-black uppercase font-mono shadow-md">
+            Exam Season 2026
+          </span>
         </div>
 
-        <div class="glass-card rounded-3xl overflow-hidden p-4">
-          <div class="overflow-x-auto">
-            <table class="w-full text-center text-xs">
-              <thead>
-                <tr class="bg-[#5C3A21]/10 text-[#5C3A21] font-black text-[10px]">
-                  <th class="p-3 text-left">Day</th>
-                  ${periods.map(p => `<th class="p-3">${p}</th>`).join('')}
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[#5C3A21]/10 font-semibold">
-                ${days.map((day, di) => `
-                  <tr>
-                    <td class="p-3 text-left font-bold text-[#5C3A21] dark:text-[#C49B66]">${day}</td>
-                    ${periods.map((_, pi) => {
-                      const subj = subjects[(di + pi) % subjects.length];
-                      const teacher = teachersMap[subj];
-                      return `
-                        <td class="p-3">
-                          <div class="p-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15 text-[#2A1A0F] dark:text-white">
-                            <p class="font-bold text-[11px]">${subj}</p>
-                            <p class="text-[9px] text-[#C49B66] font-bold mt-0.5">${teacher}</p>
-                          </div>
-                        </td>
-                      `;
-                    }).join('')}
-                  </tr>
+        <!-- Pre-First Term Exam Timetable Section -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-2">
+            <i class="lucide-calendar-check text-[#C49B66] text-xl"></i>
+            <h3 class="text-base font-extrabold text-[#5C3A21] dark:text-white font-display">Pre-First Term Examination Timetable (August 05 - 12)</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Grade 8 Exam Card -->
+            <div class="glass-card p-6 rounded-3xl space-y-4 border-t-4 border-t-[#5C3A21]">
+              <div class="flex items-center justify-between border-b border-[#5C3A21]/15 pb-3">
+                <div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#5C3A21] text-white text-[10px] font-black uppercase">Official Schedule</span>
+                  <h4 class="font-black text-sm text-[#5C3A21] dark:text-white mt-1 font-display">Grade 8 Pre-Term Exam</h4>
+                </div>
+                <span class="text-xs font-mono font-bold text-[#C49B66]">13 Students</span>
+              </div>
+              <div class="space-y-2">
+                ${grade8ExamSchedule.map(e => `
+                  <div class="flex items-center justify-between p-3 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15 text-xs">
+                    <div class="flex items-center gap-3">
+                      <span class="px-2.5 py-1 rounded-xl bg-[#5C3A21]/10 text-[#5C3A21] dark:text-[#C49B66] font-mono font-bold text-[10px]">${e.date}</span>
+                      <span class="font-bold text-[#2A1A0F] dark:text-white">${e.subject}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">${e.day}</span>
+                  </div>
                 `).join('')}
-              </tbody>
-            </table>
+              </div>
+            </div>
+
+            <!-- Grade 7 Exam Card -->
+            <div class="glass-card p-6 rounded-3xl space-y-4 border-t-4 border-t-[#C49B66]">
+              <div class="flex items-center justify-between border-b border-[#5C3A21]/15 pb-3">
+                <div>
+                  <span class="px-2.5 py-0.5 rounded-full bg-[#C49B66] text-white text-[10px] font-black uppercase">Official Schedule</span>
+                  <h4 class="font-black text-sm text-[#5C3A21] dark:text-white mt-1 font-display">Grade 7 Pre-Term Exam</h4>
+                </div>
+                <span class="text-xs font-mono font-bold text-[#C49B66]">9 Students</span>
+              </div>
+              <div class="space-y-2">
+                ${grade7ExamSchedule.map(e => `
+                  <div class="flex items-center justify-between p-3 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15 text-xs">
+                    <div class="flex items-center gap-3">
+                      <span class="px-2.5 py-1 rounded-xl bg-[#C49B66]/10 text-[#5C3A21] dark:text-[#C49B66] font-mono font-bold text-[10px]">${e.date}</span>
+                      <span class="font-bold text-[#2A1A0F] dark:text-white">${e.subject}</span>
+                    </div>
+                    <span class="text-[10px] text-slate-400 font-mono">${e.day}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Regular Weekly Period Timetable -->
+        <div class="space-y-3 pt-4">
+          <h3 class="text-sm font-extrabold text-[#5C3A21] dark:text-white font-display">Regular Period Weekly Timetable</h3>
+          <div class="glass-card rounded-3xl overflow-hidden p-4">
+            <div class="overflow-x-auto">
+              <table class="w-full text-center text-xs">
+                <thead>
+                  <tr class="bg-[#5C3A21]/10 text-[#5C3A21] font-black text-[10px]">
+                    <th class="p-3 text-left">Day</th>
+                    ${periods.map(p => `<th class="p-3">${p}</th>`).join('')}
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#5C3A21]/10 font-semibold">
+                  ${days.map((day, di) => `
+                    <tr>
+                      <td class="p-3 text-left font-bold text-[#5C3A21] dark:text-[#C49B66]">${day}</td>
+                      ${periods.map((_, pi) => {
+                        const subj = subjects[(di + pi) % subjects.length];
+                        const teacher = teachersMap[subj];
+                        return `
+                          <td class="p-3">
+                            <div class="p-2.5 rounded-xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15 text-[#2A1A0F] dark:text-white">
+                              <p class="font-bold text-[11px]">${subj}</p>
+                              <p class="text-[9px] text-[#C49B66] font-bold mt-0.5">${teacher}</p>
+                            </div>
+                          </td>
+                        `;
+                      }).join('')}
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -1544,6 +1656,12 @@
             <button onclick="window.diseApp.login('Bava Ahsani', 'admin', 'principal@darulirshad.edu.in', null, 'Principal & System Admin')" 
                     class="w-full py-3.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
               <i class="lucide-shield-check text-[#C49B66]"></i> Sign In as Principal (Bava Ahsani) - All Access
+            </button>
+
+            <!-- Parent & Student Portal Access (Public View) -->
+            <button onclick="window.diseApp.login('Parent / Student View', 'parent', 'parent@darulirshad.edu.in', null, 'Parent & Student Portal')" 
+                    class="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
+              <i class="lucide-users text-emerald-200"></i> Enter Parent & Student Portal (Notices, Student List & Timetables)
             </button>
 
             <!-- Password Form Toggle -->
