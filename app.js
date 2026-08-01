@@ -763,8 +763,9 @@
   // Attendance Register View
   function renderAttendanceView() {
     const today = new Date().toISOString().split('T')[0];
-    const classList = ['Grade 8', 'Grade 7'];
-    const activeClass = state.selectedClass === 'All' ? 'Grade 8' : state.selectedClass;
+    const userAssignedClass = state.user ? state.user.assignedClass : null;
+    const classList = userAssignedClass ? [userAssignedClass] : ['Grade 8', 'Grade 7'];
+    const activeClass = userAssignedClass || (state.selectedClass === 'All' ? 'Grade 8' : state.selectedClass);
     const studentsInClass = state.students.filter(s => s.class === activeClass);
 
     return `
@@ -772,7 +773,7 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 glass-card p-6 rounded-3xl">
           <div>
             <h2 class="text-xl font-extrabold text-[#5C3A21] dark:text-white font-display">Daily Attendance Register</h2>
-            <p class="text-xs text-slate-500 mt-1">Mark daily attendance for Grade 7 & Grade 8.</p>
+            <p class="text-xs text-slate-500 mt-1">Mark daily attendance for ${userAssignedClass ? userAssignedClass : 'Grade 7 & Grade 8'}. Logged in as: <b>${state.user ? state.user.name : ''}</b></p>
           </div>
           <div class="flex gap-3">
             <input type="date" value="${today}" class="px-4 py-2 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold" />
@@ -782,16 +783,21 @@
           </div>
         </div>
 
-        <div class="flex gap-2 overflow-x-auto pb-2">
-          ${classList.map(c => `
-            <button onclick="window.diseApp.setClassFilter('${c}')" class="px-5 py-2 rounded-2xl font-bold text-xs transition ${
-              activeClass === c ? 'bg-[#5C3A21] text-white shadow-md' : 'bg-white dark:bg-[#1F150D] text-[#5C3A21] dark:text-slate-300 border border-[#5C3A21]/20'
-            }">${c} (${state.students.filter(s=>s.class===c).length} Students)</button>
-          `).join('')}
-        </div>
+        ${!userAssignedClass ? `
+          <div class="flex gap-2 overflow-x-auto pb-2">
+            ${classList.map(c => `
+              <button onclick="window.diseApp.setClassFilter('${c}')" class="px-5 py-2 rounded-2xl font-bold text-xs transition ${
+                activeClass === c ? 'bg-[#5C3A21] text-white shadow-md' : 'bg-white dark:bg-[#1F150D] text-[#5C3A21] dark:text-slate-300 border border-[#5C3A21]/20'
+              }">${c} (${state.students.filter(s=>s.class===c).length} Students)</button>
+            `).join('')}
+          </div>
+        ` : ''}
 
         <div class="glass-card rounded-3xl p-6 space-y-4">
-          <h3 class="font-extrabold text-[#5C3A21] dark:text-white text-sm">Attendance List for ${activeClass} (${studentsInClass.length} Students)</h3>
+          <div class="flex items-center justify-between">
+            <h3 class="font-extrabold text-[#5C3A21] dark:text-white text-sm">Attendance List for ${activeClass} (${studentsInClass.length} Students)</h3>
+            <span class="px-3 py-1 rounded-full bg-[#5C3A21]/10 text-[#5C3A21] text-xs font-bold font-mono">Class Register</span>
+          </div>
           <div class="space-y-3">
             ${studentsInClass.map((st) => `
               <div class="flex items-center justify-between p-4 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/15">
@@ -1312,23 +1318,67 @@
   function renderLoginModal() {
     return `
       <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A1A0F]/70 backdrop-blur-xl">
-        <div class="glass-modal w-full max-w-md rounded-3xl p-8 shadow-2xl text-center space-y-6 border border-[#5C3A21]/20">
-          <div class="p-3.5 bg-[#F8F6F0] rounded-3xl inline-block border border-[#5C3A21]/20 shadow-md">
-            <img src="logo.png" alt="Darul Irshad School of Excellence Official Logo" class="h-28 w-auto mx-auto object-contain" />
+        <div class="glass-modal w-full max-w-lg rounded-3xl p-8 shadow-2xl space-y-6 border border-[#5C3A21]/20">
+          <div class="text-center space-y-3">
+            <div class="p-3.5 bg-[#F8F6F0] rounded-3xl inline-block border border-[#5C3A21]/20 shadow-md">
+              <img src="logo.png" alt="Darul Irshad School of Excellence Official Logo" class="h-24 w-auto mx-auto object-contain" />
+            </div>
+            <div>
+              <h2 class="text-2xl font-black text-[#5C3A21] dark:text-white tracking-tight font-display">Darul Irshad School of Excellence</h2>
+              <p class="text-xs text-[#C49B66] font-extrabold mt-1 uppercase tracking-widest">Faculty & Class Teacher ERP Portal</p>
+            </div>
           </div>
-          <div>
-            <h2 class="text-2xl font-black text-[#5C3A21] dark:text-white tracking-tight font-display">Darul Irshad School of Excellence</h2>
-            <p class="text-xs text-[#C49B66] font-extrabold mt-1 uppercase tracking-widest">Executive ERP Portal 2026</p>
-          </div>
-          <div class="space-y-3 pt-2">
-            <button onclick="window.diseApp.login('Bava Ahsani', 'admin', 'principal@darulirshad.edu.in')" class="w-full py-3.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
-              <i class="lucide-shield-check text-[#C49B66]"></i> Sign In as Principal (Bava Ahsani)
+
+          <!-- Credential Form & Fast Select -->
+          <div class="space-y-4 pt-2">
+            <p class="text-xs font-black text-center text-[#5C3A21] dark:text-[#C49B66] uppercase tracking-wider">Select Portal to Log In</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Grade 7 Teacher -->
+              <button onclick="window.diseApp.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher')" 
+                      class="p-4 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="px-2 py-0.5 rounded-md bg-[#5C3A21] text-white text-[9px] font-black">Grade 7</span>
+                  <i class="lucide-user-check text-[#C49B66] group-hover:scale-110 transition"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Faheem Saquafi</h4>
+                <p class="text-[10px] text-slate-500">Class Teacher (8 Students)</p>
+                <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">faheem.s@darulirshad.edu.in</p>
+              </button>
+
+              <!-- Grade 8 Teacher -->
+              <button onclick="window.diseApp.login('Swalih Ahsani', 'teacher', 'swalih.a@darulirshad.edu.in', 'Grade 8', 'Grade 8 Class Teacher')" 
+                      class="p-4 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="px-2 py-0.5 rounded-md bg-[#C49B66] text-white text-[9px] font-black">Grade 8</span>
+                  <i class="lucide-user-check text-[#C49B66] group-hover:scale-110 transition"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Swalih Ahsani</h4>
+                <p class="text-[10px] text-slate-500">Class Teacher (13 Students)</p>
+                <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">swalih.a@darulirshad.edu.in</p>
+              </button>
+            </div>
+
+            <!-- Principal Admin Login -->
+            <button onclick="window.diseApp.login('Bava Ahsani', 'admin', 'principal@darulirshad.edu.in', null, 'Principal & System Admin')" 
+                    class="w-full py-3.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
+              <i class="lucide-shield-check text-[#C49B66]"></i> Sign In as Principal (Bava Ahsani) - All Access
             </button>
-            <button onclick="window.diseApp.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in')" class="w-full py-3.5 bg-white hover:bg-[#F8F6F0] text-[#5C3A21] font-black text-xs rounded-2xl shadow-lg transition flex items-center justify-center gap-2 border border-[#5C3A21]/30 font-display">
-              <i class="lucide-user-check text-[#C49B66]"></i> Sign In as Faculty Member
-            </button>
+
+            <!-- Password Form Toggle -->
+            <form onsubmit="window.diseApp.handleCustomLoginSubmit(event)" class="pt-3 border-t border-[#5C3A21]/15 space-y-3">
+              <p class="text-[11px] font-bold text-[#5C3A21] dark:text-slate-300">Or Log In with Email & Password:</p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <input type="email" id="login-email" placeholder="Email Address" required class="px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold text-[#2A1A0F] dark:text-white focus:outline-none focus:border-[#5C3A21]" />
+                <input type="password" id="login-pass" placeholder="Password" required class="px-3.5 py-2.5 rounded-xl bg-white dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold text-[#2A1A0F] dark:text-white focus:outline-none focus:border-[#5C3A21]" />
+              </div>
+              <button type="submit" class="w-full py-2.5 bg-[#C49B66] hover:bg-[#a67c4b] text-white font-black text-xs rounded-xl shadow transition">
+                Sign In with Credentials
+              </button>
+            </form>
           </div>
-          <div class="pt-2 border-t border-[#5C3A21]/10 text-[10px] text-slate-500 font-bold space-y-0.5">
+
+          <div class="pt-2 border-t border-[#5C3A21]/10 text-center text-[10px] text-slate-500 font-bold space-y-0.5">
             <p>Chairman: Sayyid Ismaeel Noufal Bukhari</p>
             <p>Principal: Bava Ahsani &bull; Vice Principal: Shahul Hameed Azhari</p>
           </div>
@@ -1362,11 +1412,34 @@
       render();
     },
 
-    login: function(name, role, email) {
-      state.user = { name, role, email, designation: role === 'admin' ? 'Principal' : 'Faculty' };
+    login: function(name, role, email, assignedClass, designation) {
+      state.user = { 
+        name, 
+        role, 
+        email, 
+        assignedClass: assignedClass || null,
+        designation: designation || (role === 'admin' ? 'Principal' : 'Faculty') 
+      };
+      if (assignedClass) {
+        state.selectedClass = assignedClass;
+      } else {
+        state.selectedClass = 'All';
+      }
       setStore(STORAGE_KEYS.USER, state.user);
       render();
-      showToast('Login Successful', `Welcome ${name}`);
+      showToast('Login Successful', `Welcome ${name} ${assignedClass ? `(${assignedClass} Portal)` : ''}`);
+    },
+
+    handleCustomLoginSubmit: function(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value.trim().toLowerCase();
+      if (email.includes('faheem')) {
+        this.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher');
+      } else if (email.includes('swalih')) {
+        this.login('Swalih Ahsani', 'teacher', 'swalih.a@darulirshad.edu.in', 'Grade 8', 'Grade 8 Class Teacher');
+      } else {
+        this.login('Bava Ahsani', 'admin', email, null, 'Principal & Administrator');
+      }
     },
 
     logout: function() {
