@@ -457,12 +457,62 @@
               </div>
             </div>
             <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-              <button onclick="window.diseApp.setTab('staff')" class="px-4 py-2.5 bg-white dark:bg-[#1F150D] border border-[#5C3A21]/30 hover:bg-[#5C3A21]/10 text-[#5C3A21] dark:text-white font-extrabold text-xs rounded-2xl shadow-md transition flex items-center gap-2">
-                <i class="lucide-user-check text-[#C49B66]"></i> Staff Directory
+              <button onclick="window.diseApp.setTab('timetable')" class="px-4 py-2.5 bg-[#C49B66] hover:bg-[#a67c4b] text-white font-extrabold text-xs rounded-2xl shadow-md transition flex items-center gap-2">
+                <i class="lucide-calendar text-white"></i> Exam Timetable
               </button>
-              <button onclick="window.diseApp.openAddStudentModal()" class="px-5 py-2.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-extrabold text-xs rounded-2xl shadow-xl transition flex items-center gap-2">
-                <i class="lucide-user-plus text-[#C49B66]"></i> Add Student
+              <button onclick="window.diseApp.setTab('notices')" class="px-4 py-2.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-extrabold text-xs rounded-2xl shadow-xl transition flex items-center gap-2">
+                <i class="lucide-megaphone text-[#C49B66]"></i> Notice Board
               </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pre-First Term Exam Timetable Banner on Dashboard -->
+        <div class="glass-card p-6 rounded-3xl space-y-4 border-l-8 border-l-[#C49B66] bg-gradient-to-r from-amber-50/50 via-white to-amber-50/30 dark:from-[#1F150D] dark:to-[#140D08]">
+          <div class="flex items-center justify-between border-b border-[#5C3A21]/15 pb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-2xl bg-[#5C3A21] text-white flex items-center justify-center text-lg font-bold shadow-md">
+                <i class="lucide-calendar-check text-[#C49B66]"></i>
+              </div>
+              <div>
+                <h3 class="font-extrabold text-[#5C3A21] dark:text-white text-base font-display">Pre-First Term Examination Timetable (August 05 - 12, 2026)</h3>
+                <p class="text-xs text-slate-500">Official Exam Schedule for Grade 7 & Grade 8 Students</p>
+              </div>
+            </div>
+            <button onclick="window.diseApp.setTab('timetable')" class="px-4 py-2 bg-[#5C3A21] text-white font-bold text-xs rounded-xl shadow hover:bg-[#3A2313] transition flex items-center gap-1">
+              View Full Timetable <i class="lucide-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Grade 8 Quick Schedule -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#1F150D] border border-[#5C3A21]/20 space-y-2">
+              <div class="flex items-center justify-between border-b border-[#5C3A21]/10 pb-2">
+                <span class="font-black text-xs text-[#5C3A21] dark:text-white">Grade 8 Exam Schedule</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#5C3A21] text-white text-[9px] font-bold">Aug 05 - 12</span>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">05-08 (Wed)</span><b>Maths</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">06-08 (Thu)</span><b>Eng & Mal</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">07-08 (Fri)</span><b>Phy & Bio</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">10-08 (Mon)</span><b>S.S & Chem</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">11-08 (Tue)</span><b>Hindi</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">12-08 (Wed)</span><b>Arabic</b></div>
+              </div>
+            </div>
+
+            <!-- Grade 7 Quick Schedule -->
+            <div class="p-4 rounded-2xl bg-white dark:bg-[#1F150D] border border-[#5C3A21]/20 space-y-2">
+              <div class="flex items-center justify-between border-b border-[#5C3A21]/10 pb-2">
+                <span class="font-black text-xs text-[#5C3A21] dark:text-white">Grade 7 Exam Schedule</span>
+                <span class="px-2 py-0.5 rounded-md bg-[#C49B66] text-white text-[9px] font-bold">Aug 06 - 11</span>
+              </div>
+              <div class="grid grid-cols-2 gap-1.5 text-[11px]">
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">06-08 (Thu)</span><b>Eng & Mal</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">07-08 (Fri)</span><b>Basic Sci (B.S)</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">10-08 (Mon)</span><b>Social Sci (S.S)</b></div>
+                <div class="p-2 rounded-xl bg-[#F8F6F0] dark:bg-[#140D08]"><span class="text-[9px] text-[#C49B66] font-bold block">11-08 (Tue)</span><b>Hindi</b></div>
+              </div>
             </div>
           </div>
         </div>
