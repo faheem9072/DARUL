@@ -285,6 +285,7 @@
     notices: getStore(STORAGE_KEYS.NOTICES, []),
     documents: [],
     attendance: getStore(STORAGE_KEYS.ATTENDANCE, {}),
+    selectedAttendanceDate: new Date().toISOString().split('T')[0],
     searchQuery: '',
     selectedClass: 'All',
     selectedStaffForProfile: null,
@@ -912,9 +913,31 @@
     `;
   }
 
+  function getSchoolHolidayInfo(dateStr) {
+    if (!dateStr) return { isHoliday: false, label: '' };
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return { isHoliday: false, label: '' };
+    
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1; // 0-indexed
+    const day = parseInt(parts[2]);
+    const d = new Date(year, month, day);
+    
+    const dayOfWeek = d.getDay(); // 0 = Sun, 6 = Sat
+    
+    if (dayOfWeek === 0) {
+      return { isHoliday: true, label: 'Sunday Weekly Off (Official Holiday)' };
+    }
+    if (dayOfWeek === 6 && day >= 8 && day <= 14) {
+      return { isHoliday: true, label: 'Second Saturday Official School Holiday' };
+    }
+    return { isHoliday: false, label: '' };
+  }
+
   // Attendance Register View
   function renderAttendanceView() {
-    const today = new Date().toISOString().split('T')[0];
+    const activeDate = state.selectedAttendanceDate || new Date().toISOString().split('T')[0];
+    const holidayInfo = getSchoolHolidayInfo(activeDate);
     const isTeacher = state.user && state.user.role === 'teacher';
     const userAssignedClass = state.user ? state.user.assignedClass : null;
     const classList = userAssignedClass ? [userAssignedClass] : ['Grade 8', 'Grade 7', 'General Class (Grade 7 & 8 Combined)'];
@@ -928,7 +951,7 @@
     }
     
     // Check saved attendance for active date
-    const todayRecords = (state.attendance && state.attendance[today]) ? state.attendance[today] : {};
+    const todayRecords = (state.attendance && state.attendance[activeDate]) ? state.attendance[activeDate] : {};
 
     return `
       <div class="space-y-6">
@@ -949,12 +972,22 @@
             </p>
           </div>
           <div class="flex gap-3">
-            <input type="date" value="${today}" class="px-4 py-2 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold text-[#5C3A21] dark:text-white" />
+            <input type="date" value="${activeDate}" onchange="window.diseApp.setAttendanceDate(this.value)" class="px-4 py-2 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold text-[#5C3A21] dark:text-white" />
             <button onclick="window.diseApp.saveAttendance()" class="px-5 py-2.5 bg-[#5C3A21] text-white font-bold text-xs rounded-2xl shadow-lg hover:bg-[#3A2313] transition flex items-center gap-2 font-display">
               <i class="lucide-save text-[#C49B66]"></i> Save Register
             </button>
           </div>
         </div>
+
+        ${holidayInfo.isHoliday ? `
+          <div class="p-4 rounded-2xl bg-amber-500/10 border-2 border-amber-500/30 flex items-center justify-between text-xs text-amber-900 dark:text-amber-300 font-bold">
+            <div class="flex items-center gap-2">
+              <i class="lucide-sun text-lg text-amber-500"></i>
+              <span><b>Official School Holiday:</b> ${holidayInfo.label} (${activeDate})</span>
+            </div>
+            <span class="px-3 py-1 rounded-xl bg-amber-500 text-slate-900 text-[10px] font-black uppercase">No Attendance Required</span>
+          </div>
+        ` : ''}
 
         ${!userAssignedClass ? `
           <div class="flex gap-2 overflow-x-auto pb-2">
@@ -1909,6 +1942,11 @@
       render();
     },
 
+    setAttendanceDate: function(d) {
+      state.selectedAttendanceDate = d;
+      render();
+    },
+
     openCredentialsModal: function() {
       state.isCredentialsModalOpen = true;
       render();
@@ -2224,7 +2262,7 @@
 
     saveAttendance: function() {
       const dateInput = document.querySelector('input[type="date"]');
-      const dateVal = dateInput ? dateInput.value : new Date().toISOString().split('T')[0];
+      const dateVal = dateInput ? dateInput.value : (state.selectedAttendanceDate || new Date().toISOString().split('T')[0]);
       const userAssignedClass = state.user ? state.user.assignedClass : null;
       const activeClass = userAssignedClass || (state.selectedClass === 'All' ? 'Grade 8' : state.selectedClass);
       const studentsInClass = state.students.filter(s => s.class === activeClass);
