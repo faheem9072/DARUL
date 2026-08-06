@@ -286,6 +286,7 @@
     documents: [],
     attendance: getStore(STORAGE_KEYS.ATTENDANCE, {}),
     selectedAttendanceDate: new Date().toISOString().split('T')[0],
+    selectedReportMonth: '2026-08',
     searchQuery: '',
     selectedClass: 'All',
     selectedStaffForProfile: null,
@@ -1050,74 +1051,102 @@
         </div>
 
         <!-- Monthly Student Leave & Attendance Summary Report Table -->
-        <div class="glass-card rounded-3xl p-6 space-y-4 border-t-4 border-t-[#C49B66]">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#5C3A21]/15 pb-4">
-            <div>
-              <h3 class="font-extrabold text-[#5C3A21] dark:text-white text-base font-display flex items-center gap-2">
-                <i class="lucide-file-spreadsheet text-[#C49B66]"></i> Monthly Student Leave & Attendance Summary Report
-              </h3>
-              <p class="text-xs text-slate-500 mt-0.5">Student-wise total leaves, days present, and attendance percentage for ${activeClass}</p>
-            </div>
-            <button onclick="window.diseApp.exportMonthlyAttendanceCSV()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-2xl shadow-lg transition flex items-center gap-2 font-display self-start sm:self-auto">
-              <i class="lucide-download text-emerald-200"></i> Download Excel / CSV Report
-            </button>
-          </div>
+        ${(() => {
+          const selectedMonth = state.selectedReportMonth || '2026-08';
+          const monthNames = {
+            '2026-08': 'August 2026', '2026-09': 'September 2026', '2026-10': 'October 2026',
+            '2026-11': 'November 2026', '2026-12': 'December 2026', '2027-01': 'January 2027',
+            '2027-02': 'February 2027', '2027-03': 'March 2027'
+          };
+          const monthLabel = monthNames[selectedMonth] || selectedMonth;
 
-          <div class="overflow-x-auto rounded-2xl border border-[#5C3A21]/15">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-[#5C3A21]/10 text-[#5C3A21] dark:text-[#C49B66] font-black uppercase text-[10px]">
-                <tr>
-                  <th class="p-3">Roll #</th>
-                  <th class="p-3">Admission ID</th>
-                  <th class="p-3">Student Name</th>
-                  <th class="p-3">Class</th>
-                  <th class="p-3 text-center">Working Days</th>
-                  <th class="p-3 text-center">Days Present</th>
-                  <th class="p-3 text-center">Total Leaves / Absent</th>
-                  <th class="p-3 text-right">Attendance %</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-[#5C3A21]/10">
-                ${studentsInClass.map(st => {
-                  let presentCount = 0;
-                  let absentCount = 0;
-                  let totalSavedDates = 0;
-                  Object.keys(state.attendance || {}).forEach(date => {
-                    const rec = state.attendance[date][st.id];
-                    if (rec) {
-                      totalSavedDates++;
-                      if (rec.status === 'Present') presentCount++;
-                      else if (rec.status === 'Absent') absentCount++;
-                    }
-                  });
-                  const workingDays = totalSavedDates > 0 ? totalSavedDates : 24;
-                  const finalPresent = totalSavedDates > 0 ? presentCount : (workingDays - (st.rollNo % 2 === 0 ? 1 : 0));
-                  const finalAbsent = totalSavedDates > 0 ? absentCount : (workingDays - finalPresent);
-                  const percentage = Math.round((finalPresent / workingDays) * 100);
+          return `
+            <div class="glass-card rounded-3xl p-6 space-y-4 border-t-4 border-t-[#C49B66]">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#5C3A21]/15 pb-4">
+                <div>
+                  <h3 class="font-extrabold text-[#5C3A21] dark:text-white text-base font-display flex items-center gap-2">
+                    <i class="lucide-file-spreadsheet text-[#C49B66]"></i> Monthly Student Leave & Attendance Summary Report (${monthLabel})
+                  </h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Database Calculations for ${monthLabel} &bull; ${activeClass}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                  <select onchange="window.diseApp.setReportMonth(this.value)" class="px-3.5 py-2 rounded-2xl bg-[#F8F6F0] dark:bg-[#1F150D] border border-[#5C3A21]/20 text-xs font-bold text-[#5C3A21] dark:text-white">
+                    <option value="2026-08" ${selectedMonth === '2026-08' ? 'selected' : ''}>August 2026</option>
+                    <option value="2026-09" ${selectedMonth === '2026-09' ? 'selected' : ''}>September 2026</option>
+                    <option value="2026-10" ${selectedMonth === '2026-10' ? 'selected' : ''}>October 2026</option>
+                    <option value="2026-11" ${selectedMonth === '2026-11' ? 'selected' : ''}>November 2026</option>
+                    <option value="2026-12" ${selectedMonth === '2026-12' ? 'selected' : ''}>December 2026</option>
+                    <option value="2027-01" ${selectedMonth === '2027-01' ? 'selected' : ''}>January 2027</option>
+                    <option value="2027-02" ${selectedMonth === '2027-02' ? 'selected' : ''}>February 2027</option>
+                    <option value="2027-03" ${selectedMonth === '2027-03' ? 'selected' : ''}>March 2027</option>
+                  </select>
+                  <button onclick="window.diseApp.exportMonthlyAttendanceCSV()" class="px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-extrabold text-xs rounded-2xl shadow-lg transition flex items-center gap-2 font-display">
+                    <i class="lucide-download text-emerald-200"></i> Download Excel / CSV
+                  </button>
+                </div>
+              </div>
 
-                  return `
-                    <tr class="hover:bg-[#5C3A21]/5 font-semibold">
-                      <td class="p-3 font-mono font-bold text-[#5C3A21] dark:text-[#C49B66]">#${st.rollNo}</td>
-                      <td class="p-3 font-mono text-slate-400 text-[11px]">${st.studentId}</td>
-                      <td class="p-3 font-extrabold text-[#2A1A0F] dark:text-white">${st.name}</td>
-                      <td class="p-3"><span class="px-2 py-0.5 rounded bg-[#5C3A21]/10 text-[#5C3A21] font-bold text-[10px]">${st.class}</span></td>
-                      <td class="p-3 text-center font-bold">${workingDays} Days</td>
-                      <td class="p-3 text-center text-emerald-600 font-extrabold">${finalPresent} Days</td>
-                      <td class="p-3 text-center text-rose-600 font-extrabold">${finalAbsent} Days</td>
-                      <td class="p-3 text-right">
-                        <span class="px-2.5 py-1 rounded-xl text-[11px] font-black ${
-                          percentage >= 90 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'
-                        }">
-                          ${percentage}%
-                        </span>
-                      </td>
+              <div class="overflow-x-auto rounded-2xl border border-[#5C3A21]/15">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-[#5C3A21]/10 text-[#5C3A21] dark:text-[#C49B66] font-black uppercase text-[10px]">
+                    <tr>
+                      <th class="p-3">Roll #</th>
+                      <th class="p-3">Admission ID</th>
+                      <th class="p-3">Student Name</th>
+                      <th class="p-3">Class</th>
+                      <th class="p-3 text-center">Working Days</th>
+                      <th class="p-3 text-center">Days Present</th>
+                      <th class="p-3 text-center">Total Leaves / Absent</th>
+                      <th class="p-3 text-right">Attendance %</th>
                     </tr>
-                  `;
-                }).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
+                  </thead>
+                  <tbody class="divide-y divide-[#5C3A21]/10">
+                    ${studentsInClass.map(st => {
+                      let presentCount = 0;
+                      let absentCount = 0;
+                      let totalSavedDates = 0;
+
+                      Object.keys(state.attendance || {}).forEach(dateStr => {
+                        if (dateStr.startsWith(selectedMonth)) {
+                          const rec = state.attendance[dateStr][st.id];
+                          if (rec) {
+                            totalSavedDates++;
+                            if (rec.status === 'Present') presentCount++;
+                            else if (rec.status === 'Absent') absentCount++;
+                          }
+                        }
+                      });
+
+                      const workingDays = totalSavedDates > 0 ? totalSavedDates : 24;
+                      const finalPresent = totalSavedDates > 0 ? presentCount : (workingDays - (st.rollNo % 2 === 0 ? 1 : 0));
+                      const finalAbsent = totalSavedDates > 0 ? absentCount : (workingDays - finalPresent);
+                      const percentage = Math.round((finalPresent / workingDays) * 100);
+
+                      return `
+                        <tr class="hover:bg-[#5C3A21]/5 font-semibold">
+                          <td class="p-3 font-mono font-bold text-[#5C3A21] dark:text-[#C49B66]">#${st.rollNo}</td>
+                          <td class="p-3 font-mono text-slate-400 text-[11px]">${st.studentId}</td>
+                          <td class="p-3 font-extrabold text-[#2A1A0F] dark:text-white">${st.name}</td>
+                          <td class="p-3"><span class="px-2 py-0.5 rounded bg-[#5C3A21]/10 text-[#5C3A21] font-bold text-[10px]">${st.class}</span></td>
+                          <td class="p-3 text-center font-bold">${workingDays} Days</td>
+                          <td class="p-3 text-center text-emerald-600 font-extrabold">${finalPresent} Days</td>
+                          <td class="p-3 text-center text-rose-600 font-extrabold">${finalAbsent} Days</td>
+                          <td class="p-3 text-right">
+                            <span class="px-2.5 py-1 rounded-xl text-[11px] font-black ${
+                              percentage >= 90 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600'
+                            }">
+                              ${percentage}%
+                            </span>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `;
+        })()}
       </div>
     `;
   }
@@ -2108,47 +2137,57 @@
       showToast('CSV Export Complete', 'DISE_Students_List_2026.csv downloaded.');
     },
 
+    setReportMonth: function(m) {
+      state.selectedReportMonth = m;
+      render();
+    },
+
     exportMonthlyAttendanceCSV: function() {
       const isTeacher = state.user && state.user.role === 'teacher';
       const userAssignedClass = state.user ? state.user.assignedClass : null;
       const activeClass = userAssignedClass || (state.selectedClass === 'All' ? 'General Class (Grade 7 & 8 Combined)' : state.selectedClass);
+      const selectedMonth = state.selectedReportMonth || '2026-08';
 
       let list = state.students;
       if (activeClass !== 'General Class (Grade 7 & 8 Combined)' && activeClass !== 'All') {
         list = state.students.filter(s => s.class === activeClass);
       }
 
-      let csv = "Roll No,Admission ID,Student Name,Class,Class Teacher,Working Days,Days Present,Total Leaves/Absent,Attendance Percentage,Status Remark\n";
+      let csv = `Roll No,Admission ID,Student Name,Class,Class Teacher,Selected Month,Working Days,Days Present,Total Leaves/Absent,Attendance Percentage,Status Remark\n`;
 
       list.forEach(st => {
         let presentCount = 0;
         let absentCount = 0;
         let totalSavedDates = 0;
-        Object.keys(state.attendance || {}).forEach(date => {
-          const rec = state.attendance[date][st.id];
-          if (rec) {
-            totalSavedDates++;
-            if (rec.status === 'Present') presentCount++;
-            else if (rec.status === 'Absent') absentCount++;
+
+        Object.keys(state.attendance || {}).forEach(dateStr => {
+          if (dateStr.startsWith(selectedMonth)) {
+            const rec = state.attendance[dateStr][st.id];
+            if (rec) {
+              totalSavedDates++;
+              if (rec.status === 'Present') presentCount++;
+              else if (rec.status === 'Absent') absentCount++;
+            }
           }
         });
+
         const workingDays = totalSavedDates > 0 ? totalSavedDates : 24;
         const finalPresent = totalSavedDates > 0 ? presentCount : (workingDays - (st.rollNo % 2 === 0 ? 1 : 0));
         const finalAbsent = totalSavedDates > 0 ? absentCount : (workingDays - finalPresent);
         const percentage = Math.round((finalPresent / workingDays) * 100);
         const remark = percentage >= 90 ? 'Regular Attendance' : 'Attention Required';
 
-        csv += `${st.rollNo},${st.studentId},"${st.name}",${st.class},"${st.classTeacher}",${workingDays},${finalPresent},${finalAbsent},${percentage}%,${remark}\n`;
+        csv += `${st.rollNo},${st.studentId},"${st.name}",${st.class},"${st.classTeacher}",${selectedMonth},${workingDays},${finalPresent},${finalAbsent},${percentage}%,${remark}\n`;
       });
 
       const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csv);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `DISE_Monthly_Leave_and_Attendance_Report.csv`);
+      link.setAttribute("download", `DISE_Attendance_Report_${selectedMonth}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('Excel/CSV Exported', 'DISE_Monthly_Leave_and_Attendance_Report.csv downloaded.');
+      showToast('Excel/CSV Exported', `DISE_Attendance_Report_${selectedMonth}.csv downloaded.`);
     },
 
     openAddStudentModal: function() {
