@@ -357,7 +357,7 @@
               <i class="lucide-menu text-xl"></i>
             </button>
             <div class="flex items-center gap-3 cursor-pointer group" onclick="window.diseApp.setTab('dashboard')">
-              <img src="logo.png" alt="DISE Official Logo" class="h-11 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform" />
+              <img src="logo.png" alt="DISE Official Logo" class="h-11 w-auto object-contain drop-shadow-md group-hover:scale-105 transition-transform" style="max-height: 48px; max-width: 200px; object-fit: contain;" />
               <div class="hidden sm:block">
                 <h1 class="font-extrabold text-[#5C3A21] dark:text-white tracking-tight leading-none text-base sm:text-lg font-display">DISE Executive ERP</h1>
                 <p class="text-[10px] text-[#C49B66] font-bold tracking-wider uppercase">Darul Irshad School of Excellence</p>
@@ -432,7 +432,7 @@
       <aside class="w-64 glass-sidebar hidden md:flex flex-col py-6 px-4 shrink-0">
         <div class="px-2 mb-5 text-center">
           <div class="p-2.5 bg-[#F8F6F0] dark:bg-[#1F150D] rounded-2xl border border-[#5C3A21]/20 shadow-sm mb-2 inline-block">
-            <img src="logo.png" alt="DISE Logo" class="h-16 w-auto mx-auto object-contain" />
+            <img src="logo.png" alt="DISE Logo" class="h-16 w-auto mx-auto object-contain" style="max-height: 64px; max-width: 200px; object-fit: contain;" />
           </div>
           <p class="text-[12px] font-black text-[#5C3A21] dark:text-[#C49B66] uppercase tracking-wider font-display">Darul Irshad</p>
           <p class="text-[9px] text-[#C49B66] font-extrabold uppercase tracking-widest">School of Excellence</p>
@@ -491,7 +491,7 @@
           <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
             <div class="flex items-center gap-6">
               <div class="p-3.5 bg-white dark:bg-[#140D08] rounded-3xl border border-[#5C3A21]/20 shadow-xl bronze-glow">
-                <img src="logo.png" alt="DISE Logo" class="h-20 w-auto object-contain" />
+                <img src="logo.png" alt="DISE Logo" class="h-20 w-auto object-contain" style="max-height: 80px; max-width: 220px; object-fit: contain;" />
               </div>
               <div>
                 <div class="flex items-center gap-2">
@@ -1788,7 +1788,7 @@
         <div class="glass-modal w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 border border-[#5C3A21]/20">
           <div class="text-center space-y-3">
             <div class="p-3.5 bg-[#F8F6F0] rounded-3xl inline-block border border-[#5C3A21]/20 shadow-md">
-              <img src="logo.png" alt="Darul Irshad School of Excellence Official Logo" class="h-20 sm:h-24 w-auto mx-auto object-contain" />
+              <img src="logo.png" alt="Darul Irshad School of Excellence Official Logo" class="h-20 sm:h-24 w-auto mx-auto object-contain" style="max-height: 90px; max-width: 260px; object-fit: contain;" />
             </div>
             <div>
               <h2 class="text-2xl font-black text-[#5C3A21] dark:text-white tracking-tight font-display">Darul Irshad School of Excellence</h2>
@@ -2254,6 +2254,15 @@
       showToast('Downloading Document', `Fetching PDF for ${title}...`);
     }
   };
+
+  function initFirebaseRealtimeSync() {
+    try {
+      if (typeof firebase !== 'undefined' && firebase.database) {
+        const dbRef = firebase.database().ref('dise_sync');
+        dbRef.on('value', () => {});
+      }
+    } catch(e) {}
+  }
 
   document.addEventListener('DOMContentLoaded', () => {
     render();
