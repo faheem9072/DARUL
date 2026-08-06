@@ -3,21 +3,22 @@ import { User, UserRole } from '../types/index.ts';
 
 const ADMIN_USER: User = {
   id: 'usr-admin-1',
-  name: 'Dr. Abdul Rahman Al-Hassani',
-  email: 'admin@darulirshad.edu.in',
+  name: 'Bava Ahsani',
+  email: 'bava.ahsani@darulirshad.edu.in',
   role: 'admin',
-  designation: 'Principal & System Administrator',
-  phone: '+91 98470 00001'
+  designation: 'Principal & General Class Incharge',
+  phone: '+91 98470 22000',
+  classTeacherOf: 'General Class (Grade 7 & 8 Combined)'
 };
 
 const TEACHER_USER: User = {
   id: 'usr-teacher-1',
-  name: 'Prof. Rashid Ahmed',
-  email: 'rashid.ahmed@darulirshad.edu.in',
+  name: 'Faheem Muhammed Saquafi',
+  email: 'faheem.s@darulirshad.edu.in',
   role: 'teacher',
-  designation: 'Senior Mathematics Teacher',
-  phone: '+91 98470 00002',
-  classTeacherOf: 'Class 10-A'
+  designation: 'Grade 7 Class Teacher',
+  phone: '+91 98470 22001',
+  classTeacherOf: 'Grade 7'
 };
 
 interface AuthContextType {

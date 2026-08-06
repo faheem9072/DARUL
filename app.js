@@ -37,11 +37,43 @@
   // Official Faculty Management List
   const OFFICIAL_FACULTY = [
     {
+      id: 'stf-100',
+      staffId: 'DISE-FAC-000',
+      name: 'Bava Ahsani',
+      designation: 'Principal',
+      role: 'Principal & General Class Incharge',
+      assignedClass: 'General Class (Grade 7 & 8 Combined)',
+      subjects: ['General Class', 'Islamic Thought', 'School Administration'],
+      phone: '+91 98470 22000',
+      email: 'bava.ahsani@darulirshad.edu.in',
+      status: 'Active',
+      joinDate: '2020-06-01',
+      attendanceRate: '100%',
+      leavesTaken: 0,
+      timetable: 'Mon - Fri (8:00 AM - 4:00 PM)'
+    },
+    {
+      id: 'stf-104',
+      staffId: 'DISE-FAC-004',
+      name: 'Shahul Hameed Azhari',
+      designation: 'Vice Principal',
+      role: 'Grade 7 Senior Faculty',
+      assignedClass: 'Grade 7',
+      subjects: ['Fiqh & Hadith', 'Arabic Language'],
+      phone: '+91 98470 22004',
+      email: 'shahul.azhari@darulirshad.edu.in',
+      status: 'Active',
+      joinDate: '2022-06-01',
+      attendanceRate: '99.5%',
+      leavesTaken: 1,
+      timetable: 'Mon - Fri (8:30 AM - 2:00 PM)'
+    },
+    {
       id: 'stf-101',
       staffId: 'DISE-FAC-001',
       name: 'Faheem Muhammed Saquafi',
       designation: 'Faculty',
-      role: 'Class Teacher',
+      role: 'Grade 7 Class Teacher',
       assignedClass: 'Grade 7',
       subjects: ['Islamic Studies', 'Arabic Literature', 'Social Science'],
       phone: '+91 98470 22001',
@@ -57,7 +89,7 @@
       staffId: 'DISE-FAC-002',
       name: 'Swalih Ahsani',
       designation: 'Faculty',
-      role: 'Class Teacher',
+      role: 'Grade 8 Class Teacher',
       assignedClass: 'Grade 8',
       subjects: ['Mathematics', 'General Science', 'Logic & Ethics'],
       phone: '+91 98470 22002',
@@ -234,11 +266,20 @@
     return list;
   }
 
+  function loadStaffInitial() {
+    let list = getStore(STORAGE_KEYS.STAFF, null);
+    if (!list || list.length < 4) {
+      list = OFFICIAL_FACULTY;
+      try { localStorage.setItem(STORAGE_KEYS.STAFF, JSON.stringify(list)); } catch(e){}
+    }
+    return list;
+  }
+
   let state = {
-    user: getStore(STORAGE_KEYS.USER, { name: 'Bava Ahsani', role: 'admin', designation: 'Principal', email: 'principal@darulirshad.edu.in' }),
+    user: getStore(STORAGE_KEYS.USER, { name: 'Bava Ahsani', role: 'admin', designation: 'Principal & General Class Incharge', email: 'bava.ahsani@darulirshad.edu.in', assignedClass: 'General Class (Grade 7 & 8 Combined)' }),
     activeTab: 'dashboard',
     leadership: SCHOOL_LEADERSHIP,
-    staff: getStore(STORAGE_KEYS.STAFF, []),
+    staff: loadStaffInitial(),
     students: loadStudentsInitial(),
     leaves: getStore(STORAGE_KEYS.LEAVES, []),
     notices: getStore(STORAGE_KEYS.NOTICES, []),
@@ -338,6 +379,11 @@
               <span class="w-2.5 h-2.5 rounded-full bg-[#C49B66] animate-pulse"></span>
               <span class="text-xs font-bold text-[#5C3A21] dark:text-[#C49B66]">${state.user.designation || 'Principal'}</span>
             </div>
+
+            <button onclick="window.diseApp.openCredentialsModal()" class="px-3 py-2 rounded-xl bg-[#5C3A21]/10 text-[#5C3A21] dark:text-[#C49B66] hover:bg-[#5C3A21]/20 font-bold text-xs flex items-center gap-1.5 border border-[#5C3A21]/20 transition shadow-sm" title="View Teacher Credentials Sheet & Link">
+              <i class="lucide-key text-sm text-[#C49B66]"></i>
+              <span class="hidden lg:inline">Credentials Sheet</span>
+            </button>
 
             <button id="btn-theme-toggle" class="p-2.5 rounded-xl bg-white dark:bg-[#1F150D] text-[#5C3A21] dark:text-[#C49B66] border border-[#5C3A21]/20 hover:bg-[#5C3A21]/10 transition shadow-sm">
               <i class="lucide-moon dark:hidden text-lg"></i>
@@ -1654,6 +1700,84 @@
       `;
     }
 
+    // 8. Credentials Sheet Modal
+    if (state.isCredentialsModalOpen) {
+      return `
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A1A0F]/70 backdrop-blur-xl">
+          <div class="glass-modal w-full max-w-2xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 border border-[#5C3A21]/20">
+            <div class="flex items-center justify-between border-b border-[#5C3A21]/20 pb-3">
+              <div class="flex items-center gap-3">
+                <div class="p-2 bg-[#5C3A21] text-white rounded-2xl">
+                  <i class="lucide-key text-lg text-[#C49B66]"></i>
+                </div>
+                <div>
+                  <h3 class="font-extrabold text-base text-[#5C3A21] dark:text-white font-display">Teacher Login Credentials & Access Details</h3>
+                  <p class="text-xs text-slate-500">Official Access Guide for Tomorrow's Session (2026-2027)</p>
+                </div>
+              </div>
+              <button onclick="window.diseApp.closeModals()" class="text-slate-400 hover:text-slate-600 p-2"><i class="lucide-x text-xl"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div class="p-3.5 rounded-2xl bg-[#5C3A21]/10 border border-[#5C3A21]/20 flex flex-col sm:flex-row items-center justify-between gap-2 font-bold text-[#5C3A21] dark:text-[#C49B66]">
+                <span class="flex items-center gap-1.5"><i class="lucide-link text-sm"></i> Official Portal Link:</span>
+                <span class="font-mono bg-white dark:bg-[#1F150D] px-3 py-1 rounded-xl border border-[#5C3A21]/30">DISE ERP Management Portal</span>
+              </div>
+
+              <div class="overflow-x-auto rounded-2xl border border-[#5C3A21]/20">
+                <table class="w-full text-left text-xs">
+                  <thead class="bg-[#5C3A21]/10 text-[#5C3A21] dark:text-[#C49B66] font-black uppercase text-[10px]">
+                    <tr>
+                      <th class="p-3">Usthad Name</th>
+                      <th class="p-3">Assigned Class / Scope</th>
+                      <th class="p-3">Login Email</th>
+                      <th class="p-3">Password</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-[#5C3A21]/10">
+                    <tr class="hover:bg-[#5C3A21]/5">
+                      <td class="p-3 font-extrabold text-[#2A1A0F] dark:text-white">Bava Ahsani</td>
+                      <td class="p-3 font-bold"><span class="px-2 py-0.5 rounded bg-[#5C3A21] text-white text-[10px]">General Class (7th & 8th Combined)</span></td>
+                      <td class="p-3 font-mono text-[#C49B66] font-bold">bava.ahsani@darulirshad.edu.in</td>
+                      <td class="p-3 font-mono font-bold">bava2026</td>
+                    </tr>
+                    <tr class="hover:bg-[#5C3A21]/5">
+                      <td class="p-3 font-extrabold text-[#2A1A0F] dark:text-white">Shahul Hameed Azhari</td>
+                      <td class="p-3 font-bold"><span class="px-2 py-0.5 rounded bg-[#5C3A21]/80 text-white text-[10px]">Grade 7 Only Dashboard</span></td>
+                      <td class="p-3 font-mono text-[#C49B66] font-bold">shahul.azhari@darulirshad.edu.in</td>
+                      <td class="p-3 font-mono font-bold">shahul2026</td>
+                    </tr>
+                    <tr class="hover:bg-[#5C3A21]/5">
+                      <td class="p-3 font-extrabold text-[#2A1A0F] dark:text-white">Swalih Ahsani</td>
+                      <td class="p-3 font-bold"><span class="px-2 py-0.5 rounded bg-[#C49B66] text-white text-[10px]">Grade 8 Students & Dashboard</span></td>
+                      <td class="p-3 font-mono text-[#C49B66] font-bold">swalih.a@darulirshad.edu.in</td>
+                      <td class="p-3 font-mono font-bold">swalih2026</td>
+                    </tr>
+                    <tr class="hover:bg-[#5C3A21]/5">
+                      <td class="p-3 font-extrabold text-[#2A1A0F] dark:text-white">Faheem Muhammed Saquafi</td>
+                      <td class="p-3 font-bold"><span class="px-2 py-0.5 rounded bg-[#5C3A21] text-white text-[10px]">Grade 7 Attendance Register</span></td>
+                      <td class="p-3 font-mono text-[#C49B66] font-bold">faheem.s@darulirshad.edu.in</td>
+                      <td class="p-3 font-mono font-bold">faheem2026</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-[11px] font-medium">
+                <i class="lucide-info text-xs mr-1 font-bold"></i> System active from August 10, 2026 onwards through end of Academic Year 2027.
+              </div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-[#5C3A21]/15">
+              <button onclick="window.print()" class="px-4 py-2 bg-[#C49B66] hover:bg-[#a67c4b] text-white font-bold text-xs rounded-xl shadow flex items-center gap-1.5">
+                <i class="lucide-printer text-xs"></i> Print Credentials Sheet
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
     return '';
   }
 
@@ -1661,10 +1785,10 @@
   function renderLoginModal() {
     return `
       <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#2A1A0F]/70 backdrop-blur-xl">
-        <div class="glass-modal w-full max-w-lg rounded-3xl p-8 shadow-2xl space-y-6 border border-[#5C3A21]/20">
+        <div class="glass-modal w-full max-w-xl rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 border border-[#5C3A21]/20">
           <div class="text-center space-y-3">
             <div class="p-3.5 bg-[#F8F6F0] rounded-3xl inline-block border border-[#5C3A21]/20 shadow-md">
-              <img src="logo.png" alt="Darul Irshad School of Excellence Official Logo" class="h-24 w-auto mx-auto object-contain" />
+              <img src="logo.png" alt="Darul Irshad School of Excellence Official Logo" class="h-20 sm:h-24 w-auto mx-auto object-contain" />
             </div>
             <div>
               <h2 class="text-2xl font-black text-[#5C3A21] dark:text-white tracking-tight font-display">Darul Irshad School of Excellence</h2>
@@ -1674,44 +1798,68 @@
 
           <!-- Credential Form & Fast Select -->
           <div class="space-y-4 pt-2">
-            <p class="text-xs font-black text-center text-[#5C3A21] dark:text-[#C49B66] uppercase tracking-wider">Select Portal to Log In</p>
+            <p class="text-xs font-black text-center text-[#5C3A21] dark:text-[#C49B66] uppercase tracking-wider">Select Usthad Account to Sign In</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <!-- Grade 7 Teacher -->
-              <button onclick="window.diseApp.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher')" 
-                      class="p-4 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
+              <!-- Bava Ahsani - General Class -->
+              <button onclick="window.diseApp.login('Bava Ahsani', 'admin', 'bava.ahsani@darulirshad.edu.in', 'General Class (Grade 7 & 8 Combined)', 'Principal & General Class Incharge')" 
+                      class="p-3.5 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
                 <div class="flex items-center justify-between mb-1">
-                  <span class="px-2 py-0.5 rounded-md bg-[#5C3A21] text-white text-[9px] font-black">Grade 7</span>
-                  <i class="lucide-user-check text-[#C49B66] group-hover:scale-110 transition"></i>
+                  <span class="px-2 py-0.5 rounded-md bg-[#5C3A21] text-white text-[9px] font-black">General Class</span>
+                  <i class="lucide-shield-check text-[#C49B66] group-hover:scale-110 transition"></i>
                 </div>
-                <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Faheem Saquafi</h4>
-                <p class="text-[10px] text-slate-500">Class Teacher (8 Students)</p>
-                <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">faheem.s@darulirshad.edu.in</p>
+                <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Bava Ahsani</h4>
+                <p class="text-[10px] text-slate-500">General Class (7th & 8th Combined - 21 Students)</p>
+                <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">bava.ahsani@darulirshad.edu.in</p>
               </button>
 
-              <!-- Grade 8 Teacher -->
+              <!-- Shahul Hameed Azhari Usthad - Grade 7 Only -->
+              <button onclick="window.diseApp.login('Shahul Hameed Azhari', 'teacher', 'shahul.azhari@darulirshad.edu.in', 'Grade 7', 'Vice Principal & Grade 7 Senior Faculty')" 
+                      class="p-3.5 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="px-2 py-0.5 rounded-md bg-[#5C3A21]/80 text-white text-[9px] font-black">Grade 7 Only</span>
+                  <i class="lucide-user-check text-[#C49B66] group-hover:scale-110 transition"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Shahul Hameed Azhari</h4>
+                <p class="text-[10px] text-slate-500">Vice Principal (Grade 7 Dashboard - 9 Students)</p>
+                <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">shahul.azhari@darulirshad.edu.in</p>
+              </button>
+
+              <!-- Swalih Ahsani - Grade 8 -->
               <button onclick="window.diseApp.login('Swalih Ahsani', 'teacher', 'swalih.a@darulirshad.edu.in', 'Grade 8', 'Grade 8 Class Teacher')" 
-                      class="p-4 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
+                      class="p-3.5 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
                 <div class="flex items-center justify-between mb-1">
                   <span class="px-2 py-0.5 rounded-md bg-[#C49B66] text-white text-[9px] font-black">Grade 8</span>
                   <i class="lucide-user-check text-[#C49B66] group-hover:scale-110 transition"></i>
                 </div>
                 <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Swalih Ahsani</h4>
-                <p class="text-[10px] text-slate-500">Class Teacher (13 Students)</p>
+                <p class="text-[10px] text-slate-500">Grade 8 Class Teacher (13 Students)</p>
                 <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">swalih.a@darulirshad.edu.in</p>
+              </button>
+
+              <!-- Faheem Muhammed Saquafi - Grade 7 -->
+              <button onclick="window.diseApp.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher')" 
+                      class="p-3.5 rounded-2xl bg-white dark:bg-[#1F150D] hover:bg-[#5C3A21]/10 text-left border border-[#5C3A21]/20 hover:border-[#5C3A21] transition shadow-md group">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="px-2 py-0.5 rounded-md bg-[#5C3A21] text-white text-[9px] font-black">Grade 7</span>
+                  <i class="lucide-user-check text-[#C49B66] group-hover:scale-110 transition"></i>
+                </div>
+                <h4 class="font-extrabold text-xs text-[#2A1A0F] dark:text-white">Faheem Saquafi</h4>
+                <p class="text-[10px] text-slate-500">Grade 7 Class Teacher (9 Students)</p>
+                <p class="text-[9px] text-[#C49B66] font-mono mt-1 font-bold">faheem.s@darulirshad.edu.in</p>
               </button>
             </div>
 
-            <!-- Principal Admin Login -->
+            <!-- Principal Full Admin Login -->
             <button onclick="window.diseApp.login('Bava Ahsani', 'admin', 'principal@darulirshad.edu.in', null, 'Principal & System Admin')" 
-                    class="w-full py-3.5 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
-              <i class="lucide-shield-check text-[#C49B66]"></i> Sign In as Principal (Bava Ahsani) - All Access
+                    class="w-full py-3 bg-[#5C3A21] hover:bg-[#3A2313] text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
+              <i class="lucide-shield-check text-[#C49B66]"></i> Sign In as Principal Admin (All Access)
             </button>
 
             <!-- Parent & Student Portal Access (Public View) -->
             <button onclick="window.diseApp.login('Parent / Student View', 'parent', 'parent@darulirshad.edu.in', null, 'Parent & Student Portal')" 
-                    class="w-full py-3.5 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
-              <i class="lucide-users text-emerald-200"></i> Enter Parent & Student Portal (Notices, Student List & Timetables)
+                    class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs rounded-2xl shadow-xl transition flex items-center justify-center gap-2 font-display">
+              <i class="lucide-users text-emerald-200"></i> Enter Parent & Student Portal (Notices & Timetables)
             </button>
 
             <!-- Password Form Toggle -->
@@ -1761,6 +1909,11 @@
       render();
     },
 
+    openCredentialsModal: function() {
+      state.isCredentialsModalOpen = true;
+      render();
+    },
+
     login: function(name, role, email, assignedClass, designation) {
       state.user = { 
         name, 
@@ -1782,12 +1935,16 @@
     handleCustomLoginSubmit: function(e) {
       e.preventDefault();
       const email = document.getElementById('login-email').value.trim().toLowerCase();
-      if (email.includes('faheem') || email.includes('7')) {
-        this.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher');
+      if (email.includes('shahul') || email.includes('azhari')) {
+        this.login('Shahul Hameed Azhari', 'teacher', 'shahul.azhari@darulirshad.edu.in', 'Grade 7', 'Vice Principal & Grade 7 Senior Faculty');
       } else if (email.includes('swalih') || email.includes('8')) {
         this.login('Swalih Ahsani', 'teacher', 'swalih.a@darulirshad.edu.in', 'Grade 8', 'Grade 8 Class Teacher');
+      } else if (email.includes('faheem') || email.includes('7')) {
+        this.login('Faheem Muhammed Saquafi', 'teacher', 'faheem.s@darulirshad.edu.in', 'Grade 7', 'Grade 7 Class Teacher');
+      } else if (email.includes('bava') || email.includes('general')) {
+        this.login('Bava Ahsani', 'admin', 'bava.ahsani@darulirshad.edu.in', 'General Class (Grade 7 & 8 Combined)', 'Principal & General Class Incharge');
       } else {
-        this.login('Bava Ahsani', 'admin', 'principal@darulirshad.edu.in', null, 'Principal & Administrator');
+        this.login('Bava Ahsani', 'admin', email || 'principal@darulirshad.edu.in', null, 'Principal & System Admin');
       }
     },
 
@@ -1900,6 +2057,7 @@
       state.selectedStaffForProfile = null;
       state.selectedStudentForIDCard = null;
       state.isCommandPaletteOpen = false;
+      state.isCredentialsModalOpen = false;
       state.isAddStudentModalOpen = false;
       state.isAddStaffModalOpen = false;
       state.isAddLeaveModalOpen = false;
